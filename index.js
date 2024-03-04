@@ -353,8 +353,11 @@ async function run() {
           } },
           { $group: { 
             _id: '$category',
-            image: { $first: '$image' } // Get the featured photo URL from the first product in each category
+            image: { $first: '$image' }, // Get the featured photo URL from the first product in each category
+            matchedCount: { $sum: 1 } // Count the occurrences of each category
           } },
+          { $sort: { matchedCount: -1 } }, // Sort by matched count in descending order
+          { $project: { _id: 0, category: '$_id', image: 1 } }, // Rename _id to category
           { $limit: 12 }
         ]).toArray();
     
