@@ -325,7 +325,9 @@ async function run() {
     })
 
     app.get("/popularArtist", async(req, res) => {
-      
+      const sort = {total_products : -1};
+      const result = await usersCollection.find({}, 'email userName userPhoto _id').sort(sort).limit(12).toArray();
+      res.send(result)
     })
 
     app.post("/users", async (req, res) => {
@@ -337,6 +339,30 @@ async function run() {
       }
       const result = await usersCollection.insertOne(user);
       res.send(result)
+    })
+
+    app.get("/popularCategories", async(req, res) => {
+      try {
+    
+        const popularCategories = await productsCollection.aggregate([
+          { $unwind: '$product_categories' },
+          { $project: { 
+            _id: 0,
+            category: { $toLower: '$product_categories' },
+            image: '$featured_photo' // Include featured photo URL
+          } },
+          { $group: { 
+            _id: '$category',
+            image: { $first: '$image' } // Get the featured photo URL from the first product in each category
+          } },
+          { $limit: 12 }
+        ]).toArray();
+    
+        res.json(popularCategories);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+      }
     })
 
     app.get("/eachUser/:email", async (req, res) => {
