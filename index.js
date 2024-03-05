@@ -4,8 +4,8 @@ const cors = require("cors");
 // var jwt = require('jsonwebtoken');
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
-
-
+const fs = require('fs');
+const { Readable } = require('stream');
 require('dotenv').config()
 const app = express();
 // const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
@@ -17,10 +17,7 @@ const port = process.env.PORT || 8000;
 
 app.use(cors());
 app.use(express.json());
-app.use(fileUpload({
-  useTempFiles: true,
-  tempFileDir: './public/Images'
-}));
+app.use(fileUpload());
 
 
 // Configure Cloudinary with your Cloud Name, API Key, and API Secret
@@ -84,26 +81,37 @@ async function run() {
       console.log(req.files);
       try {
         if (!req.files || Object.keys(req.files).length === 0) {
-          return res.status(400).send('No files were uploaded.');
+            return res.status(400).send('No files were uploaded.');
         }
-    
+
         const imageFile = req.files.file;
-        console.log(imageFile);
-        // Upload image to Cloudinary
-        const result = await cloudinary.uploader.upload(imageFile.tempFilePath);
-    
+        if (!imageFile.data || !(imageFile.data instanceof Buffer)) {
+            throw new Error('Invalid file data.');
+        }
+
+        const stream = Readable.from(imageFile.data);
+
+        const result = await new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            });
+            stream.pipe(uploadStream);
+        });
+
         console.log('Image uploaded to Cloudinary:', result);
-    
         res.json({ url: result.secure_url });
-      } catch (error) {
+    } catch (error) {
         console.error('Error uploading image to Cloudinary:', error);
         res.status(500).send('Internal server error');
-      }
+    }
     });
 
 
     app.post('/uploadMultiple', async (req, res) => {
-      console.log(req.files);
       try {
         if (!req.files || !req.files.files || req.files.files.length === 0) {
           return res.status(400).json({ message: 'No files were uploaded.' });
@@ -111,7 +119,17 @@ async function run() {
     
         const images = req.files.files;
         const uploadPromises = images.map(async (image) => {
-          const { secure_url } = await cloudinary.uploader.upload(image.tempFilePath);
+          const imageStream = new Readable();
+          imageStream.push(image.data);
+          imageStream.push(null);
+    
+          const { secure_url } = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream((error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            });
+            imageStream.pipe(stream);
+          });
           return secure_url;
         });
     
@@ -137,6 +155,12 @@ async function run() {
 
     app.post("/products", async (req, res) => {
       const product = req.body;
+      const addedBy = product?.addedBy;
+      const filter = {email: addedBy};
+      const updateDoc = {
+        $inc: { total_products: 1 } 
+      }
+      const updateUser = await usersCollection.updateOne(filter, updateDoc);
       const result = await productsCollection.insertOne(product);
       res.send(result)
     })
@@ -357,7 +381,7 @@ async function run() {
             matchedCount: { $sum: 1 } // Count the occurrences of each category
           } },
           { $sort: { matchedCount: -1 } }, // Sort by matched count in descending order
-          { $project: { _id: 0, category: '$_id', image: 1 } }, // Rename _id to category
+          { $project: { _id: 0, category: '$_id', image: 1, count: '$matchedCount' } }, // Rename _id to category and include count
           { $limit: 12 }
         ]).toArray();
     
@@ -366,6 +390,13 @@ async function run() {
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });
       }
+    })
+
+    app.get("/eachArtistProducts/:email", async(req, res) => {
+      const email = req.params.email;
+      const filter = {addedBy: email};
+      const result = await productsCollection.find(filter).toArray();
+      res.send(result)
     })
 
     app.get("/eachUser/:email", async (req, res) => {
