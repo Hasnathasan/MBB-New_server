@@ -21,7 +21,7 @@ app.use(fileUpload());
 
 
 // Configure Cloudinary with your Cloud Name, API Key, and API Secret
- 
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -81,33 +81,33 @@ async function run() {
       console.log(req.files);
       try {
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).send('No files were uploaded.');
+          return res.status(400).send('No files were uploaded.');
         }
 
         const imageFile = req.files.file;
         if (!imageFile.data || !(imageFile.data instanceof Buffer)) {
-            throw new Error('Invalid file data.');
+          throw new Error('Invalid file data.');
         }
 
         const stream = Readable.from(imageFile.data);
 
         const result = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve(result);
-                }
-            });
-            stream.pipe(uploadStream);
+          const uploadStream = cloudinary.uploader.upload_stream({ resource_type: "auto" }, (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          });
+          stream.pipe(uploadStream);
         });
 
         console.log('Image uploaded to Cloudinary:', result);
         res.json({ url: result.secure_url });
-    } catch (error) {
+      } catch (error) {
         console.error('Error uploading image to Cloudinary:', error);
         res.status(500).send('Internal server error');
-    }
+      }
     });
 
 
@@ -116,13 +116,13 @@ async function run() {
         if (!req.files || !req.files.files || req.files.files.length === 0) {
           return res.status(400).json({ message: 'No files were uploaded.' });
         }
-    
+
         const images = req.files.files;
         const uploadPromises = images.map(async (image) => {
           const imageStream = new Readable();
           imageStream.push(image.data);
           imageStream.push(null);
-    
+
           const { secure_url } = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream((error, result) => {
               if (error) reject(error);
@@ -132,7 +132,7 @@ async function run() {
           });
           return secure_url;
         });
-    
+
         const imageUrls = await Promise.all(uploadPromises);
         res.json({ imageUrls });
       } catch (error) {
@@ -142,7 +142,7 @@ async function run() {
     });
 
 
-  
+
 
 
     app.post('/jwt', (req, res) => {
@@ -151,13 +151,13 @@ async function run() {
       res.send({ token })
     })
 
-   
+
 
     app.post("/products", async (req, res) => {
       const addedBy = product?.addedBy;
-      const filter = {email: addedBy};
+      const filter = { email: addedBy };
       const updateDoc = {
-        $inc: { total_products: 1 } 
+        $inc: { total_products: 1 }
       }
       const updateUser = await usersCollection.updateOne(filter, updateDoc);
       const result = await productsCollection.insertOne(product);
@@ -171,7 +171,7 @@ async function run() {
           { $group: { _id: '$product_categories' } }, // Group by product category
           { $project: { _id: 0, category: '$_id' } } // Project to rename _id as category
         ]).toArray();
-    
+
         res.json(uniqueCategories.map(category => category.category));
       } catch (error) {
         console.error('Error retrieving categories:', error); // Log the error
@@ -181,151 +181,151 @@ async function run() {
 
     app.get("/products", async (req, res) => {
       const { category, priceSlider, minRating, searchQuery } = req.query;
-  
+
       try {
-          let matchedProducts;
-          let priceQuery = {};
-          let ratingQuery = {};
-  
-          // Parse priceSlider to an array and convert values to numbers
-          const priceSliderArray = priceSlider && priceSlider.length > 0 ? priceSlider.split(",").map(Number) : null;
-  
-          if (priceSliderArray && priceSliderArray.length === 2) {
-              const minPrice = priceSliderArray[0];
-              const maxPrice = priceSliderArray[1];
-  
-              // Check if the product has sale_price within the price range
-              priceQuery = { "price.sale_price": { $gte: minPrice, $lte: maxPrice } };
-          }
-  
-          // If sale_price not available, fall back to regular_price
-          if (!priceQuery["price.sale_price"]) {
-              priceQuery = { "price.regular_price": { $gte: minPrice, $lte: maxPrice } };
-          }
-  
-          if (minRating) {
-              // Construct rating query based on minRating
-              ratingQuery = { rating: { $gte: parseInt(minRating.replace("rating", "")) } };
-          }
-  
-          const searchRegex = new RegExp(searchQuery, 'i'); // Case-insensitive regex for search
-  
-          if (category) {
-              if (Object.keys(priceQuery).length !== 0) {
-                  if (Object.keys(ratingQuery).length !== 0) {
-                      // Filter by category, price range, minimum rating, and search query
-                      matchedProducts = await productsCollection.find({
-                          $and: [
-                              { product_categories: { $regex: category, $options: 'i' } },
-                              priceQuery,
-                              ratingQuery,
-                              { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
-                          ]
-                      }).toArray();
-                  } else {
-                      // Filter by category, price range, and search query
-                      matchedProducts = await productsCollection.find({
-                          $and: [
-                              { product_categories: { $regex: category, $options: 'i' } },
-                              priceQuery,
-                              { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
-                          ]
-                      }).toArray();
-                  }
-              } else {
-                  if (Object.keys(ratingQuery).length !== 0) {
-                      // Filter by category, minimum rating, and search query
-                      matchedProducts = await productsCollection.find({
-                          $and: [
-                              { product_categories: { $regex: category, $options: 'i' } },
-                              ratingQuery,
-                              { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
-                          ]
-                      }).toArray();
-                  } else {
-                      // Filter only by category and search query
-                      matchedProducts = await productsCollection.find({
-                          $and: [
-                              { product_categories: { $regex: category, $options: 'i' } },
-                              { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
-                          ]
-                      }).toArray();
-                  }
-              }
+        let matchedProducts;
+        let priceQuery = {};
+        let ratingQuery = {};
+
+        // Parse priceSlider to an array and convert values to numbers
+        const priceSliderArray = priceSlider && priceSlider.length > 0 ? priceSlider.split(",").map(Number) : null;
+
+        if (priceSliderArray && priceSliderArray.length === 2) {
+          const minPrice = priceSliderArray[0];
+          const maxPrice = priceSliderArray[1];
+
+          // Check if the product has sale_price within the price range
+          priceQuery = { "price.sale_price": { $gte: minPrice, $lte: maxPrice } };
+        }
+
+        // If sale_price not available, fall back to regular_price
+        if (!priceQuery["price.sale_price"]) {
+          priceQuery = { "price.regular_price": { $gte: minPrice, $lte: maxPrice } };
+        }
+
+        if (minRating) {
+          // Construct rating query based on minRating
+          ratingQuery = { rating: { $gte: parseInt(minRating.replace("rating", "")) } };
+        }
+
+        const searchRegex = new RegExp(searchQuery, 'i'); // Case-insensitive regex for search
+
+        if (category) {
+          if (Object.keys(priceQuery).length !== 0) {
+            if (Object.keys(ratingQuery).length !== 0) {
+              // Filter by category, price range, minimum rating, and search query
+              matchedProducts = await productsCollection.find({
+                $and: [
+                  { product_categories: { $regex: category, $options: 'i' } },
+                  priceQuery,
+                  ratingQuery,
+                  { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
+                ]
+              }).toArray();
+            } else {
+              // Filter by category, price range, and search query
+              matchedProducts = await productsCollection.find({
+                $and: [
+                  { product_categories: { $regex: category, $options: 'i' } },
+                  priceQuery,
+                  { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
+                ]
+              }).toArray();
+            }
           } else {
-              if (Object.keys(priceQuery).length !== 0) {
-                  if (Object.keys(ratingQuery).length !== 0) {
-                      // Filter only by price range, minimum rating, and search query
-                      matchedProducts = await productsCollection.find({
-                          $and: [
-                              priceQuery,
-                              ratingQuery,
-                              { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
-                          ]
-                      }).toArray();
-                  } else {
-                      // Filter only by price range and search query
-                      matchedProducts = await productsCollection.find({
-                          $and: [
-                              priceQuery,
-                              { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
-                          ]
-                      }).toArray();
-                  }
-              } else {
-                  if (Object.keys(ratingQuery).length !== 0) {
-                      // Filter only by minimum rating and search query
-                      matchedProducts = await productsCollection.find({
-                          $and: [
-                              ratingQuery,
-                              { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
-                          ]
-                      }).toArray();
-                  } else {
-                      // Filter only by search query
-                      matchedProducts = await productsCollection.find({
-                          $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }]
-                      }).toArray();
-                  }
-              }
+            if (Object.keys(ratingQuery).length !== 0) {
+              // Filter by category, minimum rating, and search query
+              matchedProducts = await productsCollection.find({
+                $and: [
+                  { product_categories: { $regex: category, $options: 'i' } },
+                  ratingQuery,
+                  { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
+                ]
+              }).toArray();
+            } else {
+              // Filter only by category and search query
+              matchedProducts = await productsCollection.find({
+                $and: [
+                  { product_categories: { $regex: category, $options: 'i' } },
+                  { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
+                ]
+              }).toArray();
+            }
           }
-  
-          res.json(matchedProducts);
+        } else {
+          if (Object.keys(priceQuery).length !== 0) {
+            if (Object.keys(ratingQuery).length !== 0) {
+              // Filter only by price range, minimum rating, and search query
+              matchedProducts = await productsCollection.find({
+                $and: [
+                  priceQuery,
+                  ratingQuery,
+                  { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
+                ]
+              }).toArray();
+            } else {
+              // Filter only by price range and search query
+              matchedProducts = await productsCollection.find({
+                $and: [
+                  priceQuery,
+                  { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
+                ]
+              }).toArray();
+            }
+          } else {
+            if (Object.keys(ratingQuery).length !== 0) {
+              // Filter only by minimum rating and search query
+              matchedProducts = await productsCollection.find({
+                $and: [
+                  ratingQuery,
+                  { $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }] }
+                ]
+              }).toArray();
+            } else {
+              // Filter only by search query
+              matchedProducts = await productsCollection.find({
+                $or: [{ product_name: searchRegex }, { product_categories: { $elemMatch: { $regex: searchRegex } } }, { product_tags: { $elemMatch: { $regex: searchRegex } } }]
+              }).toArray();
+            }
+          }
+        }
+
+        res.json(matchedProducts);
       } catch (error) {
-          console.error('Error searching for products:', error);
-          res.status(500).json({ error: 'Internal server error' });
+        console.error('Error searching for products:', error);
+        res.status(500).json({ error: 'Internal server error' });
       }
-  });
-  
+    });
+
     // app.get("/products", async (req, res) => {
     //   const { category, priceSlider, minRating } = req.query;
-    
+
     //   try {
     //     let matchedProducts;
     //     let priceQuery = {};
     //     let ratingQuery = {};
-    
+
     //     // Parse priceSlider to an array and convert values to numbers
     //     const priceSliderArray = priceSlider && priceSlider.length > 0 ? priceSlider.split(",").map(Number) : null;
-    
+
     //     if (priceSliderArray && priceSliderArray.length === 2) {
     //       const minPrice = priceSliderArray[0];
     //       const maxPrice = priceSliderArray[1];
-    
+
     //       // Check if the product has sale_price within the price range
     //       priceQuery = { "price.sale_price": { $gte: minPrice, $lte: maxPrice } };
     //     }
-    
+
     //     // If sale_price not available, fall back to regular_price
     //     if (!priceQuery["price.sale_price"]) {
     //       priceQuery = { "price.regular_price": { $gte: minPrice, $lte: maxPrice } };
     //     }
-    
+
     //     if (minRating) {
     //       // Construct rating query based on minRating
     //       ratingQuery = { rating: { $gte: parseInt(minRating.replace("rating", "")) } };
     //     }
-    
+
     //     if (category) {
     //       if (Object.keys(priceQuery).length !== 0) {
     //         if (Object.keys(ratingQuery).length !== 0) {
@@ -386,7 +386,7 @@ async function run() {
     //         }
     //       }
     //     }
-    
+
     //     res.json(matchedProducts);
     //   } catch (error) {
     //     console.error('Error searching for products:', error);
@@ -394,36 +394,36 @@ async function run() {
     //   }
     // });
 
-   
-    app.post("/cart", async(req, res) => {
+
+    app.post("/cart", async (req, res) => {
       const cartProduct = req.body;
       const result = await cartsCollection.insertOne(cartProduct);
       res.send(result)
     })
-    app.get("/userCart/:userEmail", async(req, res) => {
+    app.get("/userCart/:userEmail", async (req, res) => {
       const userEmail = req.params.userEmail;
-      const filter = {addedBy: userEmail};
+      const filter = { addedBy: userEmail };
       const result = await cartsCollection.find(filter).toArray();
       res.send(result)
     })
 
-    app.get("/popularProducts", async(req, res) => {
-      const sort = {rating: -1};
+    app.get("/popularProducts", async (req, res) => {
+      const sort = { rating: -1 };
       const result = await productsCollection.find().sort(sort).limit(15).toArray();
       res.send(result)
     })
 
-    app.get("/singleProduct/:id", async(req, res) => {
+    app.get("/singleProduct/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const result = await productsCollection.findOne(filter);
       res.send(result)
     })
 
     app.post('/relatedProducts', async (req, res) => {
-      const  product_categories  = req.body;
+      const product_categories = req.body;
       console.log(product_categories);
-  
+
       try {
         const matchedProducts = await productsCollection.find({
           product_categories: { $regex: product_categories.join('|'), $options: 'i' }
@@ -461,14 +461,14 @@ async function run() {
       res.send(result)
     })
 
-    app.get("/artist/:email", async(req, res) => {
+    app.get("/artist/:email", async (req, res) => {
       const email = req.params.email;
-      const result = await usersCollection.findOne({email});
+      const result = await usersCollection.findOne({ email });
       res.send(result);
     })
 
-    app.get("/popularArtist", async(req, res) => {
-      const sort = {total_products : -1};
+    app.get("/popularArtist", async (req, res) => {
+      const sort = { total_products: -1 };
       const result = await usersCollection.find({}, 'email userName userPhoto _id').sort(sort).limit(12).toArray();
       res.send(result)
     })
@@ -484,26 +484,30 @@ async function run() {
       res.send(result)
     })
 
-    app.get("/popularCategories", async(req, res) => {
+    app.get("/popularCategories", async (req, res) => {
       try {
-    
+
         const popularCategories = await productsCollection.aggregate([
           { $unwind: '$product_categories' },
-          { $project: { 
-            _id: 0,
-            category: { $toLower: '$product_categories' },
-            image: '$featured_photo' // Include featured photo URL
-          } },
-          { $group: { 
-            _id: '$category',
-            image: { $first: '$image' }, // Get the featured photo URL from the first product in each category
-            matchedCount: { $sum: 1 } // Count the occurrences of each category
-          } },
+          {
+            $project: {
+              _id: 0,
+              category: { $toLower: '$product_categories' },
+              image: '$featured_photo' // Include featured photo URL
+            }
+          },
+          {
+            $group: {
+              _id: '$category',
+              image: { $first: '$image' }, // Get the featured photo URL from the first product in each category
+              matchedCount: { $sum: 1 } // Count the occurrences of each category
+            }
+          },
           { $sort: { matchedCount: -1 } }, // Sort by matched count in descending order
           { $project: { _id: 0, category: '$_id', image: 1, count: '$matchedCount' } }, // Rename _id to category and include count
           { $limit: 12 }
         ]).toArray();
-    
+
         res.json(popularCategories);
       } catch (err) {
         console.error(err);
@@ -511,9 +515,9 @@ async function run() {
       }
     })
 
-    app.get("/eachArtistProducts/:email", async(req, res) => {
+    app.get("/eachArtistProducts/:email", async (req, res) => {
       const email = req.params.email;
-      const filter = {addedBy: email};
+      const filter = { addedBy: email };
       const result = await productsCollection.find(filter).toArray();
       res.send(result)
     })
