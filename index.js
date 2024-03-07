@@ -2,6 +2,11 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require("cors");
 // var jwt = require('jsonwebtoken');
+var admin = require("firebase-admin");
+var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
+
+
+
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -10,9 +15,11 @@ require('dotenv').config()
 const app = express();
 // const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 const port = process.env.PORT || 8000;
+ 
 
-
-
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 // Middleware
 
 app.use(cors());
@@ -154,6 +161,7 @@ async function run() {
 
 
     app.post("/products", async (req, res) => {
+      const product = req.body;
       const addedBy = product?.addedBy;
       const filter = { email: addedBy };
       const updateDoc = {
@@ -467,6 +475,29 @@ async function run() {
       res.send(result);
     })
 
+    app.post("/artistByAdmin", async(req, res) => {
+      console.log(req.body);
+      try {
+        const userData = req.body; // Extract user data from request body
+        const { email, password, userName } = userData;
+    
+        if (!email || !password || !userName) {
+          return res.status(400).send({ message: 'Missing required fields' });
+        }
+    
+        const createdUser = await admin.auth().createUser({
+          email,
+          password,
+          userName,
+        });
+    
+        res.status(201).send({ message: `User created successfully with UID: ${createdUser.uid}` });
+      } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: 'Failed to create user' });
+      }
+    })
+
     app.get("/popularArtist", async (req, res) => {
       const sort = { total_products: -1 };
       const result = await usersCollection.find({}, 'email userName userPhoto _id').sort(sort).limit(12).toArray();
@@ -602,11 +633,6 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-
-
-
-
 
 
 
