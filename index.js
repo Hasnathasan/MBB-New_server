@@ -158,7 +158,15 @@ async function run() {
       res.send({ token })
     })
 
-
+    app.get("/productLength", async (req, res) => {
+      try {
+          const productsCount = await productsCollection.countDocuments();
+          res.json({ length: productsCount });
+      } catch (error) {
+          console.error("Error retrieving product count:", error);
+          res.status(500).json({ error: "Internal server error" });
+      }
+  });
 
     app.post("/products", async (req, res) => {
       const product = req.body;
@@ -446,7 +454,13 @@ async function run() {
 
     app.post("/prisons", async (req, res) => {
       const prison = req.body;
-      const result = await prisonsCollection.insertOne(prison);
+      const email = prison?.email;
+      const filter = {email};
+      const isPrisonAvailable = await prisonsCollection.findOne(filter);
+      if(isPrisonAvailable){
+        res.status(500).send({message: "This Email has already been taken"})  
+      }
+      const result = await prisonsCollection.insertOne(prison); 
       res.send(result)
     })
     app.get("/prisons", async (req, res) => {
@@ -490,11 +504,11 @@ async function run() {
           password,
           userName,
         });
-    
-        res.status(201).send({ message: `User created successfully with UID: ${createdUser.uid}` });
+        const postUser = await usersCollection.insertOne(userData);
+        res.status(201).send({ message: `Successfully created user` });
       } catch (error) {
         console.error(error);
-        res.status(500).send({ message: 'Failed to create user' });
+        res.status(500).send({ message: error?.message });
       }
     })
 
