@@ -7,7 +7,7 @@ const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 
 
- 
+
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -16,7 +16,7 @@ require('dotenv').config()
 const app = express();
 // const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 const port = process.env.PORT || 8000;
- 
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -161,43 +161,43 @@ async function run() {
 
     app.get("/productsLength", async (req, res) => {
       try {
-          const productsCount = await productsCollection.countDocuments();
-          res.json({ length: productsCount });
+        const productsCount = await productsCollection.countDocuments();
+        res.json({ length: productsCount });
       } catch (error) {
-          console.error("Error retrieving product count:", error);
-          res.status(500).json({ error: "Internal server error" });
+        console.error("Error retrieving product count:", error);
+        res.status(500).json({ error: "Internal server error" });
       }
-  });
+    });
     app.get("/ordersLength", async (req, res) => {
       try {
-          const productsCount = await productsCollection.countDocuments();
-          res.json({ length: productsCount });
+        const productsCount = await productsCollection.countDocuments();
+        res.json({ length: productsCount });
       } catch (error) {
-          console.error("Error retrieving product count:", error);
-          res.status(500).json({ error: "Internal server error" });
+        console.error("Error retrieving product count:", error);
+        res.status(500).json({ error: "Internal server error" });
       }
-  });
-  app.get('/usersByRole', async (req, res) => {
-    try {
+    });
+    app.get('/usersByRole', async (req, res) => {
+      try {
         const userCounts = await usersCollection.aggregate([
-            {
-                $group: {
-                    _id: "$userRole", 
-                    count: { $sum: 1 }
-                }
+          {
+            $group: {
+              _id: "$userRole",
+              count: { $sum: 1 }
             }
+          }
         ]).toArray();
         console.log("object", userCounts);
         const userCountByRole = userCounts.reduce((acc, { _id, count }) => {
-            acc[_id] = count;
-            return acc;
+          acc[_id] = count;
+          return acc;
         }, {});
 
         res.json(userCountByRole);
-    } catch (error) {
+      } catch (error) {
         res.status(500).json({ message: error.message });
-    }
-});
+      }
+    });
 
     app.post("/products", async (req, res) => {
       const product = req.body;
@@ -486,14 +486,14 @@ async function run() {
     app.post("/prisons", async (req, res) => {
       const prison = req.body;
       const email = prison?.email;
-      const filter = {email};
+      const filter = { email };
       const isPrisonAvailable = await prisonsCollection.findOne(filter);
-      if(isPrisonAvailable){
-        res.status(500).send({message: "This Email has already been taken"})  
+      if (isPrisonAvailable) {
+        res.status(500).send({ message: "This Email has already been taken" })
       }
-      else{
-        const result = await prisonsCollection.insertOne(prison); 
-      res.send(result)
+      else {
+        const result = await prisonsCollection.insertOne(prison);
+        res.send(result)
       }
     })
     app.get("/prisons", async (req, res) => {
@@ -522,16 +522,16 @@ async function run() {
       res.send(result);
     })
 
-    app.post("/artistByAdmin", async(req, res) => {
+    app.post("/artistByAdmin", async (req, res) => {
       console.log(req.body);
       try {
         const userData = req.body; // Extract user data from request body
         const { email, password, userName } = userData;
-    
+
         if (!email || !password || !userName) {
           return res.status(400).send({ message: 'Missing required fields' });
         }
-    
+
         const createdUser = await admin.auth().createUser({
           email,
           password,
