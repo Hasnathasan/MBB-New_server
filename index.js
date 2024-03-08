@@ -158,7 +158,7 @@ async function run() {
       res.send({ token })
     })
 
-    app.get("/productLength", async (req, res) => {
+    app.get("/productsLength", async (req, res) => {
       try {
           const productsCount = await productsCollection.countDocuments();
           res.json({ length: productsCount });
@@ -167,6 +167,36 @@ async function run() {
           res.status(500).json({ error: "Internal server error" });
       }
   });
+    app.get("/ordersLength", async (req, res) => {
+      try {
+          const productsCount = await productsCollection.countDocuments();
+          res.json({ length: productsCount });
+      } catch (error) {
+          console.error("Error retrieving product count:", error);
+          res.status(500).json({ error: "Internal server error" });
+      }
+  });
+  app.get('/usersByRole', async (req, res) => {
+    try {
+        const userCounts = await usersCollection.aggregate([
+            {
+                $group: {
+                    _id: "$userRole",
+                    count: { $sum: 1 }
+                }
+            }
+        ]).toArray();
+        console.log("object", userCounts);
+        const userCountByRole = userCounts.reduce((acc, { _id, count }) => {
+            acc[_id] = count;
+            return acc;
+        }, {});
+
+        res.json(userCountByRole);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
     app.post("/products", async (req, res) => {
       const product = req.body;
