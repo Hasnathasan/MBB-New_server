@@ -3,10 +3,11 @@ const express = require('express');
 const cors = require("cors");
 // var jwt = require('jsonwebtoken');
 var admin = require("firebase-admin");
+const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 
 
-
+ 
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
 const fs = require('fs');
@@ -181,7 +182,7 @@ async function run() {
         const userCounts = await usersCollection.aggregate([
             {
                 $group: {
-                    _id: "$userRole",
+                    _id: "$userRole", 
                     count: { $sum: 1 }
                 }
             }
@@ -490,8 +491,10 @@ async function run() {
       if(isPrisonAvailable){
         res.status(500).send({message: "This Email has already been taken"})  
       }
-      const result = await prisonsCollection.insertOne(prison); 
+      else{
+        const result = await prisonsCollection.insertOne(prison); 
       res.send(result)
+      }
     })
     app.get("/prisons", async (req, res) => {
       const result = await prisonsCollection.find().toArray();
@@ -661,6 +664,21 @@ async function run() {
       const filter = { email };
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result)
+    })
+
+
+    app.post('/create-payment-intent', verifyJWT, async (req, res) => {
+      const { classPrice } = req.body;
+      const amount = classPrice * 100;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ["card"]
+      })
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      })
     })
 
     // Send a ping to confirm a successful connection
