@@ -674,6 +674,12 @@ async function run() {
       res.send(result)
     })
 
+    app.delete("/orders/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id : new ObjectId(id)};
+      const result = await ordersCollection.deleteOne(id);
+    })
+
     app.patch("/orders/:id", async(req, res) => {
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)}
