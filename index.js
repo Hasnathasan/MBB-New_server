@@ -670,7 +670,14 @@ async function run() {
     app.get("/orders/:email", async(req, res) => {
       const email = req.params.email;
       const filter = {"userDetails.email": email};
-      const result = await ordersCollection.find(filter).toArray();
+      const sortCriteria = {createdAt: -1};
+      const result = await ordersCollection.find(filter).sort(sortCriteria).toArray();
+      res.send(result)
+    })
+    app.get("/singleOrder/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const result = await ordersCollection.findOne(filter);
       res.send(result)
     })
 
