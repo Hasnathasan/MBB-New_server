@@ -81,6 +81,7 @@ async function run() {
     const productsCollection = db.collection("products");
     const prisonsCollection = db.collection("prisons");
     const cartsCollection = db.collection("cart");
+    const ordersCollection = db.collection("orders");
 
 
 
@@ -664,6 +665,26 @@ async function run() {
       const filter = { email };
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result)
+    })
+
+
+    app.post("/orders", async(req, res) => {
+      const order = req.body;
+      const result = await ordersCollection.insertOne(order);
+      res.send(result)
+    })
+
+    app.patch("/orders/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const transactionId = req.query.transactionId;
+      const updateDoc = {
+        $set: {
+          transactionId
+        }
+      };
+      const result = await ordersCollection.updateOne(filter, updateDoc);
+      res.send(result);
     })
 
 
