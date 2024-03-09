@@ -667,6 +667,13 @@ async function run() {
       res.send(result)
     })
 
+    app.get("/orders/:email", async(req, res) => {
+      const email = req.params.email;
+      const filter = {"userDetails.email": email};
+      const result = await ordersCollection.find(filter).toArray();
+      res.send(result)
+    })
+
 
     app.post("/orders", async(req, res) => {
       const order = req.body;
@@ -677,7 +684,8 @@ async function run() {
     app.delete("/orders/:id", async(req, res) => {
       const id = req.params.id;
       const filter = {_id : new ObjectId(id)};
-      const result = await ordersCollection.deleteOne(id);
+      const result = await ordersCollection.deleteOne(filter);
+      res.send(result)
     })
 
     app.patch("/orders/:id", async(req, res) => {
