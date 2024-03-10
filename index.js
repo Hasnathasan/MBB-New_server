@@ -171,6 +171,15 @@ async function run() {
     });
     app.get("/ordersLength", async (req, res) => {
       try {
+        const ordersCount = await ordersCollection.countDocuments();
+        res.json({ length: ordersCount });
+      } catch (error) {
+        console.error("Error retrieving product count:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
+    });
+    app.get("/ordersLength", async (req, res) => {
+      try {
         const productsCount = await productsCollection.countDocuments();
         res.json({ length: productsCount });
       } catch (error) {
@@ -667,37 +676,42 @@ async function run() {
       res.send(result)
     })
 
-    app.get("/orders/:email", async(req, res) => {
+    app.get("/orders/:email", async (req, res) => {
       const email = req.params.email;
-      const filter = {"userDetails.email": email};
-      const sortCriteria = {createdAt: -1};
+      const filter = { "userDetails.email": email };
+      const sortCriteria = { createdAt: -1 };
       const result = await ordersCollection.find(filter).sort(sortCriteria).toArray();
       res.send(result)
     })
-    app.get("/singleOrder/:id", async(req, res) => {
+    app.get("/allOrders", async (req, res) => {
+      const sortCriteria = { createdAt: -1 };
+      const result = await ordersCollection.find().sort(sortCriteria).toArray();
+      res.send(result)
+    })
+    app.get("/singleOrder/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const result = await ordersCollection.findOne(filter);
       res.send(result)
     })
 
 
-    app.post("/orders", async(req, res) => {
+    app.post("/orders", async (req, res) => {
       const order = req.body;
       const result = await ordersCollection.insertOne(order);
       res.send(result)
     })
 
-    app.delete("/orders/:id", async(req, res) => {
+    app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id : new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const result = await ordersCollection.deleteOne(filter);
       res.send(result)
     })
 
-    app.patch("/orders/:id", async(req, res) => {
+    app.patch("/orders/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)}
+      const filter = { _id: new ObjectId(id) }
       const transactionId = req.query.transactionId;
       const updateDoc = {
         $set: {
