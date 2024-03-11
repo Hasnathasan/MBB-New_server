@@ -620,14 +620,17 @@ async function run() {
 
     app.patch("/userUpdate/:email", async (req, res) => {
       const email = req.params.email;
-      const { updatedName, updatedNum } = req.body;
-      console.log(updatedName, updatedNum, email);
+      const { updatedName, updatedNum, userphoto } = req.body;
+      const filter = {email: email}
       const updateDoc = {
         $set: {
           userName: updatedName,
-          userPhoneNumber: updatedNum
+          userPhoneNumber: updatedNum,
+          userPhoto: userphoto
         }
       };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result)
     })
     app.patch("/artistUpdate/:email", async (req, res) => {
       const email = req.params.email;
