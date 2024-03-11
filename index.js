@@ -621,7 +621,7 @@ async function run() {
     app.patch("/userUpdate/:email", async (req, res) => {
       const email = req.params.email;
       const { updatedName, updatedNum, userphoto } = req.body;
-      const filter = {email: email}
+      const filter = { email: email }
       const updateDoc = {
         $set: {
           userName: updatedName,
@@ -716,27 +716,27 @@ async function run() {
     app.post("/ordersUpdate/:id", async (req, res) => {
       const products = req.body;
       console.log(products);
-      const updatePromises = products.map(async product => { 
-          const query = { _id: new ObjectId(product?.product_id) };
-          const updateDocForProduct = {
-              $inc: { available_quantity: -product?.quantity } // Decrement available_quantity by 1
-          };
-          return await productsCollection.updateOne(query, updateDocForProduct);
+      const updatePromises = products.map(async product => {
+        const query = { _id: new ObjectId(product?.product_id) };
+        const updateDocForProduct = {
+          $inc: { available_quantity: -product?.quantity } // Decrement available_quantity by 1
+        };
+        return await productsCollection.updateOne(query, updateDocForProduct);
       });
-  
+
       // Wait for all product updates to complete
       await Promise.all(updatePromises);
-  
+
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const transactionId = req.query.transactionId;
       const updateDoc = {
-          $set: { transactionId }
+        $set: { transactionId }
       };
-  
+
       const result = await ordersCollection.updateOne(filter, updateDoc);
       res.send(result);
-  });
+    });
 
 
     app.post('/create-payment-intent', async (req, res) => {
