@@ -354,103 +354,6 @@ async function run() {
       }
     });
 
-    // app.get("/products", async (req, res) => {
-    //   const { category, priceSlider, minRating } = req.query;
-
-    //   try {
-    //     let matchedProducts;
-    //     let priceQuery = {};
-    //     let ratingQuery = {};
-
-    //     // Parse priceSlider to an array and convert values to numbers
-    //     const priceSliderArray = priceSlider && priceSlider.length > 0 ? priceSlider.split(",").map(Number) : null;
-
-    //     if (priceSliderArray && priceSliderArray.length === 2) {
-    //       const minPrice = priceSliderArray[0];
-    //       const maxPrice = priceSliderArray[1];
-
-    //       // Check if the product has sale_price within the price range
-    //       priceQuery = { "price.sale_price": { $gte: minPrice, $lte: maxPrice } };
-    //     }
-
-    //     // If sale_price not available, fall back to regular_price
-    //     if (!priceQuery["price.sale_price"]) {
-    //       priceQuery = { "price.regular_price": { $gte: minPrice, $lte: maxPrice } };
-    //     }
-
-    //     if (minRating) {
-    //       // Construct rating query based on minRating
-    //       ratingQuery = { rating: { $gte: parseInt(minRating.replace("rating", "")) } };
-    //     }
-
-    //     if (category) {
-    //       if (Object.keys(priceQuery).length !== 0) {
-    //         if (Object.keys(ratingQuery).length !== 0) {
-    //           // Filter by category, price range, and minimum rating
-    //           matchedProducts = await productsCollection.find({
-    //             $and: [
-    //               { product_categories: { $regex: category, $options: 'i' } },
-    //               priceQuery,
-    //               ratingQuery
-    //             ]
-    //           }).toArray();
-    //         } else {
-    //           // Filter by category and price range
-    //           matchedProducts = await productsCollection.find({
-    //             $and: [
-    //               { product_categories: { $regex: category, $options: 'i' } },
-    //               priceQuery
-    //             ]
-    //           }).toArray();
-    //         }
-    //       } else {
-    //         if (Object.keys(ratingQuery).length !== 0) {
-    //           // Filter by category and minimum rating
-    //           matchedProducts = await productsCollection.find({
-    //             $and: [
-    //               { product_categories: { $regex: category, $options: 'i' } },
-    //               ratingQuery
-    //             ]
-    //           }).toArray();
-    //         } else {
-    //           // Filter only by category
-    //           matchedProducts = await productsCollection.find({
-    //             product_categories: { $regex: category, $options: 'i' }
-    //           }).toArray();
-    //         }
-    //       }
-    //     } else {
-    //       if (Object.keys(priceQuery).length !== 0) {
-    //         if (Object.keys(ratingQuery).length !== 0) {
-    //           // Filter only by price range and minimum rating
-    //           matchedProducts = await productsCollection.find({
-    //             $and: [
-    //               priceQuery,
-    //               ratingQuery
-    //             ]
-    //           }).toArray();
-    //         } else {
-    //           // Filter only by price range
-    //           matchedProducts = await productsCollection.find(priceQuery).toArray();
-    //         }
-    //       } else {
-    //         if (Object.keys(ratingQuery).length !== 0) {
-    //           // Filter only by minimum rating
-    //           matchedProducts = await productsCollection.find(ratingQuery).toArray();
-    //         } else {
-    //           // Fetch all products
-    //           matchedProducts = await productsCollection.find().toArray();
-    //         }
-    //       }
-    //     }
-
-    //     res.json(matchedProducts);
-    //   } catch (error) {
-    //     console.error('Error searching for products:', error);
-    //     res.status(500).json({ error: 'Internal server error' });
-    //   }
-    // });
-
 
     app.post("/cart", async (req, res) => {
       const cartProduct = req.body;
@@ -679,6 +582,31 @@ async function run() {
       res.send(result)
     })
 
+    app.patch("/reviews/:product_id", async (req, res) => {
+      try {
+          const reviewByUser = req.body;
+          const product_id = req.params.product_id;
+  
+          const filter = { _id: new ObjectId(product_id) };
+  
+          const update = {
+              $push: {
+                  reviews: {
+                      $each: [reviewByUser], 
+                      $position: 0 
+                  }
+              }
+          };
+  
+          const result = await productsCollection.updateOne(filter, update);
+  
+          res.send(result)
+      } catch (error) {
+          console.error("Error updating review:", error);
+          res.status(500).send("Internal Server Error");
+      }
+  });
+
     app.get("/orders/:email", async (req, res) => {
       const email = req.params.email;
       const filter = { "userDetails.email": email };
@@ -767,9 +695,6 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-
-
 
 
 
