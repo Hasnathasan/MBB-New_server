@@ -587,20 +587,51 @@ async function run() {
           const reviewByUser = req.body;
           const product_id = req.params.product_id;
   
+          // Assuming your MongoDB client is initialized and stored in a variable called 'db'
+  
+          // Filter to find the product by its ID
           const filter = { _id: new ObjectId(product_id) };
   
+          // Update operation to push the new review to the beginning of the array
           const update = {
               $push: {
                   reviews: {
-                      $each: [reviewByUser], 
-                      $position: 0 
+                      $each: [reviewByUser], // new review to be added
+                      $position: 0 // add it to the beginning of the array
                   }
               }
           };
   
+          // Perform the update
           const result = await productsCollection.updateOne(filter, update);
   
-          res.send(result)
+          // Check if the update was successful
+          if (result.modifiedCount === 1) {
+              // Recalculate product rating
+              const product = await productsCollection.findOne(filter);
+              const reviews = product.reviews || [];
+              const totalReviews = reviews.length;
+              let totalRating = 0;
+  
+              // Calculate total rating from all reviews
+              reviews.forEach(review => {
+                  totalRating += review.rating;
+              });
+  
+              // Calculate the average rating
+              const averageRating = totalRating / totalReviews;
+  
+              // Update product rating
+              await productsCollection.updateOne(filter, {
+                  $set: {
+                      rating: averageRating
+                  }
+              });
+  
+              res.status(200).send("Review added successfully");
+          } else {
+              res.status(404).send("Product not found");
+          }
       } catch (error) {
           console.error("Error updating review:", error);
           res.status(500).send("Internal Server Error");
@@ -647,7 +678,7 @@ async function run() {
       const updatePromises = products.map(async product => {
         const query = { _id: new ObjectId(product?.product_id) };
         const updateDocForProduct = {
-          $inc: { available_quantity: -product?.quantity } // Decrement available_quantity by 1
+          $inc: { available_quantity: -product?.quantity } 
         };
         return await productsCollection.updateOne(query, updateDocForProduct);
       });
