@@ -522,6 +522,37 @@ async function run() {
     });
 
 
+    app.put("/categories/:categoryName", async (req, res) => {
+      try {
+        const categoryName = req.params.categoryName;
+        const { category, image } = req.body;
+    
+        // Check if the category exists
+        const existingCategory = await categoryCollection.findOne({ category: { $regex: new RegExp(`^${categoryName}$`, 'i') } });
+    
+        if (!existingCategory) {
+          return res.status(404).json({ message: 'Category not found' });
+        }
+    
+        // Update the category data
+        const updatedData = {};
+        if (category) updatedData.category = category.toLowerCase();
+        if (image) updatedData.image = image;
+    
+        // Perform the update
+        await categoryCollection.updateOne(
+          { category: { $regex: new RegExp(`^${categoryName}$`, 'i') } },
+          { $set: updatedData }
+        );
+    
+        res.json({ message: 'Category updated successfully' });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    });
+
+
     app.post("/categories", async (req, res) => {
       try {
         const { category, image } = req.body;
