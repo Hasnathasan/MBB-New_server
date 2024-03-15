@@ -82,6 +82,7 @@ async function run() {
     const prisonsCollection = db.collection("prisons");
     const cartsCollection = db.collection("cart");
     const ordersCollection = db.collection("orders");
+    const categoryCollection = db.collection("categories");
 
 
 
@@ -477,7 +478,6 @@ async function run() {
 
     app.get("/popularCategories", async (req, res) => {
       try {
-
         const popularCategories = await productsCollection.aggregate([
           { $unwind: '$product_categories' },
           {
@@ -498,13 +498,50 @@ async function run() {
           { $project: { _id: 0, category: '$_id', image: 1, count: '$matchedCount' } }, // Rename _id to category and include count
           { $limit: 12 }
         ]).toArray();
-
+  
+        // Save or update categories in categoryCollection
+        for (const category of popularCategories) {
+          const existingCategory = await categoryCollection.findOne({ category: category.category });
+          if (existingCategory) {
+            // Update existing category
+            await categoryCollection.updateOne(
+              { category: category.category },
+              { $set: { count: category.count, image: category.image } }
+            );
+          } else {
+            // Insert new category
+            await categoryCollection.insertOne(category);
+          }
+        }
+  
         res.json(popularCategories);
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });
       }
-    })
+    });
+
+
+    app.post("/categories", async (req, res) => {
+      try {
+        const { category, image } = req.body;
+    
+        // Check if the category already exists in a case-insensitive manner
+        const existingCategory = await categoryCollection.findOne({ category: { $regex: new RegExp(`^${category}$`, 'i') } });
+    
+        if (existingCategory) {
+          return res.status(400).json({ message: 'Category already exists' });
+        }
+    
+        // Insert the new category into the database
+        await categoryCollection.insertOne({ category: category.toLowerCase(), image });
+    
+        res.status(201).json({ message: 'Category added successfully' });
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    });
 
     app.get("/eachArtistProducts/:email", async (req, res) => {
       const email = req.params.email;
