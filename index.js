@@ -766,6 +766,49 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/artist-sales/:artistEmail', async (req, res) => {
+      try {
+        const artistEmail = req.params.artistEmail;
+        // Find orders where artist added the product
+        const orders = await ordersCollection.find({
+          'products': {
+            $elemMatch: {
+              'artist_details.artist': artistEmail
+            }
+          }
+        }).toArray();
+        console.log(orders);
+        let totalArtistProfit = 0;
+        let totalWebsiteProfit = 0;
+        let totalPrisonProfit = 0;
+    
+        // Calculate total profits
+        orders.forEach(order => {
+          order.products.forEach(product => {
+            if (product?.artist_details?.artist === artistEmail) {
+              const quantity = product.quantity;
+              const artistTotal = product.profit_distribution.artist_profit_details.artistTotal;
+              const websiteProfit = product.profit_distribution.website_profit_details.websiteProfit;
+              const prisonProfit = product.profit_distribution.prison_profit_details.prisonProfit;
+              totalArtistProfit += quantity * artistTotal;
+              totalWebsiteProfit += quantity * websiteProfit;
+              totalPrisonProfit += quantity * prisonProfit;
+            }
+          });
+        });
+    
+        res.json({
+          artistEmail,
+          totalArtistProfit,
+          totalWebsiteProfit,
+          totalPrisonProfit
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    });
+
 
     app.post('/create-payment-intent', async (req, res) => {
       const { subTotal } = req.body;
