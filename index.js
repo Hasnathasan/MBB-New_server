@@ -506,7 +506,7 @@ async function run() {
             // Update existing category
             await categoryCollection.updateOne(
               { category: category.category },
-              { $set: { count: category.count, image: category.image } }
+              { $set: { count: category.count } }
             );
           } else {
             // Insert new category
@@ -514,7 +514,8 @@ async function run() {
           }
         }
   
-        res.json(popularCategories);
+        const allCategories = await categoryCollection.find().sort({count: -1}).toArray();
+    res.json(allCategories);
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });
@@ -522,7 +523,7 @@ async function run() {
     });
 
 
-    app.put("/categories/:categoryName", async (req, res) => {
+    app.patch("/categories/:categoryName", async (req, res) => {
       try {
         const categoryName = req.params.categoryName;
         const { category, image } = req.body;
