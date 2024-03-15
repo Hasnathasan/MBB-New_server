@@ -731,20 +731,21 @@ async function run() {
       try {
           const order = req.body;
           const products = order.products;
-  
+  console.log(order);
           // Check each product in the order
           for (const product of products) {
               const { product_id, quantity } = product;
   
               // Check if product exists in productsCollection
-              const existingProduct = await productsCollection.findOne({ _id: product_id });
+              const existingProduct = await productsCollection.findOne({ _id: new ObjectId(product_id) });
+              console.log(existingProduct);
               if (!existingProduct) {
-                  return res.status(404).send(`Product with ID ${product_id} not found`);
+                  return res.status(500).send({message: `Product with ID ${product_id} not found`});
               }
   
               // Check if available_quantity is sufficient
               if (existingProduct.available_quantity < quantity) {
-                  return res.status(400).send(`Insufficient quantity for product ${product_id}`);
+                  return res.status(400).send({message: `Insufficient quantity for product ${product_id}`});
               }
           }
   
@@ -753,7 +754,7 @@ async function run() {
           res.status(201).send(result);
       } catch (error) {
           console.error(error);
-          res.status(500).send('Internal server error');
+          res.status(500).send({message:'Internal server error'});
       }
   });
 
