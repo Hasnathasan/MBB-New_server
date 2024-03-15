@@ -728,10 +728,34 @@ async function run() {
 
 
     app.post("/orders", async (req, res) => {
-      const order = req.body;
-      const result = await ordersCollection.insertOne(order);
-      res.send(result)
-    })
+      try {
+          const order = req.body;
+          const products = order.products;
+  
+          // Check each product in the order
+          for (const product of products) {
+              const { product_id, quantity } = product;
+  
+              // Check if product exists in productsCollection
+              const existingProduct = await productsCollection.findOne({ _id: product_id });
+              if (!existingProduct) {
+                  return res.status(404).send(`Product with ID ${product_id} not found`);
+              }
+  
+              // Check if available_quantity is sufficient
+              if (existingProduct.available_quantity < quantity) {
+                  return res.status(400).send(`Insufficient quantity for product ${product_id}`);
+              }
+          }
+  
+          // If all products are available and have sufficient quantity, insert the order
+          const result = await ordersCollection.insertOne(order);
+          res.status(201).send(result);
+      } catch (error) {
+          console.error(error);
+          res.status(500).send('Internal server error');
+      }
+  });
 
     app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
