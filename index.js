@@ -188,6 +188,73 @@ async function run() {
         res.status(500).json({ error: "Internal server error" });
       }
     });
+
+
+    app.get('/sold-products-count-last-12-months', async (req, res) => {
+      try {
+          // Calculate the start date (first day of the current month 12 months ago)
+          const startDate = new Date();
+          startDate.setMonth(startDate.getMonth() - 11);
+          startDate.setDate(1);
+          // Calculate the end date (last day of the current month)
+          const endDate = new Date();
+          endDate.setHours(23, 59, 59, 999);
+
+          // Aggregate orders for the last 12 months
+          const soldProductsLast12Months = await db.collection('orders').aggregate([
+              {
+                  $match: {
+                      createdAt: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } // Filter orders within the last 12 months
+                  }
+              },
+              {
+                  $unwind: "$products" // Unwind the products array
+              },
+              {
+                  $group: {
+                      _id: {
+                          month: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
+                      },
+                      totalQuantity: { $sum: "$products.quantity" } // Sum the quantity of sold products
+                  }
+              },
+              {
+                  $sort: { "_id.month": 1 } // Sort by month
+              }
+          ]).toArray();
+
+          // Construct response object with sold product count for each month of the last 12 months
+          const soldProductsCountLast12Months = {};
+
+          // Iterate over all 12 months
+          for (let i = 0; i < 12; i++) {
+              // Calculate the month for the current iteration
+              const monthYearKey = new Date(startDate);
+              monthYearKey.setMonth(startDate.getMonth() + i);
+              const month = monthYearKey.toLocaleString('en-us', { month: 'short' });
+
+              // Initialize the count for the current month to 0
+              soldProductsCountLast12Months[month] = 0;
+          }
+
+          // Update counts for existing months
+          soldProductsLast12Months.forEach(monthData => {
+              const month = new Date(startDate);
+              month.setMonth(monthData._id.month - 1);
+              const monthName = month.toLocaleString('en-us', { month: 'short' });
+
+              soldProductsCountLast12Months[monthName] = monthData.totalQuantity;
+          });
+
+          res.json(soldProductsCountLast12Months);
+      } catch (error) {
+          console.error('Error fetching sold products count for the last 12 months:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+      }
+  });
+
+
+
     app.get('/usersByRole', async (req, res) => {
       try {
         const userCounts = await usersCollection.aggregate([
