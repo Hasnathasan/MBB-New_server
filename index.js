@@ -461,7 +461,7 @@ async function run() {
 
     app.get("/popularArtist", async (req, res) => {
       const sort = { total_products: -1 };
-      const result = await usersCollection.find({}, 'email userName userPhoto _id').sort(sort).limit(12).toArray();
+      const result = await usersCollection.find({"userRole": "artist"}, 'email userName userPhoto _id').sort(sort).limit(12).toArray();
       res.send(result)
     })
 
@@ -475,6 +475,46 @@ async function run() {
       const result = await usersCollection.insertOne(user);
       res.send(result)
     })
+
+    app.get('/orders-by-month', async (req, res) => {
+      try {
+          // Aggregate orders by month
+          const ordersByMonth = await ordersCollection.aggregate([
+              {
+                  $group: {
+                      _id: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
+                      count: { $sum: 1 } // Count number of orders in each month
+                  }
+              },
+              {
+                  $sort: { "_id": 1 } // Sort by month
+              }
+          ]).toArray();
+
+          // Create an object to hold counts for each month
+          const ordersCountByMonth = {};
+          // Define array of month names
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+          // Initialize counts to 0 for all months
+          for (let i = 0; i < monthNames.length; i++) {
+              ordersCountByMonth[monthNames[i].toLowerCase()] = 0;
+          }
+
+          // Update counts for existing months
+          ordersByMonth.forEach(month => {
+              const monthIndex = month._id - 1; // MongoDB months are 1-indexed
+              const monthName = monthNames[monthIndex].toLowerCase();
+              ordersCountByMonth[monthName] = month.count;
+          });
+
+          res.json(ordersCountByMonth);
+      } catch (error) {
+          console.error('Error fetching orders by month:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+      }
+  });
+
 
     app.get("/popularCategories", async (req, res) => {
       try {
@@ -863,6 +903,7 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
 
 
 
