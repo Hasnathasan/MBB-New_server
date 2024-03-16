@@ -476,41 +476,61 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/orders-by-month', async (req, res) => {
+    app.get('/orders-last-12-months', async (req, res) => {
       try {
-          // Aggregate orders by month
-          const ordersByMonth = await ordersCollection.aggregate([
+          // Calculate the start date (first day of the current month 12 months ago)
+          const startDate = new Date();
+          startDate.setMonth(startDate.getMonth() - 11);
+          startDate.setDate(1);
+          // Calculate the end date (last day of the current month)
+          const endDate = new Date();
+          endDate.setHours(23, 59, 59, 999);
+
+          // Aggregate orders for the last 12 months
+          const ordersLast12Months = await db.collection('orders').aggregate([
               {
-                  $group: {
-                      _id: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
-                      count: { $sum: 1 } // Count number of orders in each month
+                  $match: {
+                      createdAt: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } // Filter orders within the last 12 months
                   }
               },
               {
-                  $sort: { "_id": 1 } // Sort by month
+                  $group: {
+                      _id: {
+                          month: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
+                          year: { $year: { $dateFromString: { dateString: "$createdAt" } } } // Extract year from the date string
+                      },
+                      count: { $sum: 1 } // Count number of orders in each month and year
+                  }
+              },
+              {
+                  $sort: { "_id.year": 1, "_id.month": 1 } // Sort by year and month
               }
           ]).toArray();
 
-          // Create an object to hold counts for each month
-          const ordersCountByMonth = {};
-          // Define array of month names
-          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          // Construct response object with counts for each month of the last 12 months
+          const ordersCountLast12Months = {};
 
-          // Initialize counts to 0 for all months
-          for (let i = 0; i < monthNames.length; i++) {
-              ordersCountByMonth[monthNames[i].toLowerCase()] = 0;
+          // Iterate over all 12 months
+          for (let i = 0; i < 12; i++) {
+              // Calculate the month and year for the current iteration
+              const monthYearKey = new Date(startDate);
+              monthYearKey.setMonth(startDate.getMonth() + i);
+              const month = monthYearKey.toLocaleString('en-us', { month: 'short' });
+              const year = monthYearKey.getFullYear();
+
+              // Initialize the count for the current month to 0
+              ordersCountLast12Months[month] = 0;
           }
 
           // Update counts for existing months
-          ordersByMonth.forEach(month => {
-              const monthIndex = month._id - 1; // MongoDB months are 1-indexed
-              const monthName = monthNames[monthIndex].toLowerCase();
-              ordersCountByMonth[monthName] = month.count;
+          ordersLast12Months.forEach(monthYear => {
+              const month = new Date(`${monthYear._id.year}-${monthYear._id.month}-01`).toLocaleString('en-us', { month: 'short' });
+              ordersCountLast12Months[month] = monthYear.count;
           });
 
-          res.json(ordersCountByMonth);
+          res.json(ordersCountLast12Months);
       } catch (error) {
-          console.error('Error fetching orders by month:', error);
+          console.error('Error fetching orders for the last 12 months:', error);
           res.status(500).json({ error: 'Internal Server Error' });
       }
   });
