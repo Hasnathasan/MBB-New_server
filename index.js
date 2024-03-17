@@ -296,6 +296,50 @@ async function run() {
       }
     });
 
+    app.patch("/updateCategories", async (req, res) => {
+      const categoryToUpdate = req.body;
+      const category = categoryToUpdate?.category;
+      const previousCategory = categoryToUpdate?.previous_category;
+      const image = categoryToUpdate?.image;
+      const id = categoryToUpdate?.id;
+      console.log(categoryToUpdate, image);
+  
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+          $set: {
+              category 
+          }
+      };
+  
+      if (image) {
+          updateDoc.$set.image = image;
+      }
+  
+      // Update the category
+      const result = await categoryCollection.updateOne(filter, updateDoc);
+  if(previousCategory == category){
+    return res.send({ 
+      updatedCategory: result
+  });
+  }
+      // If the category was updated successfully
+      if (result.modifiedCount > 0) {
+          // Update products with the new category (case insensitive)
+          const productsUpdateResult = await productsCollection.updateMany(
+              { "product_categories": previousCategory }, // Filter products by previous category
+              { $set: { "product_categories.$[elem]": category } }, // Update matched category
+              { arrayFilters: [{ "elem": { $regex: new RegExp('^' + previousCategory + '$', "i") } }] } // Case insensitive regex
+          );
+          
+          res.send({ 
+              updatedCategory: result, 
+              updatedProducts: productsUpdateResult 
+          });
+      } else {
+          res.status(404).send({ message: "Category not found" });
+      }
+  });
+
     app.get("/products", async (req, res) => {
       const { category, priceSlider, minRating, searchQuery } = req.query;
 
@@ -1014,7 +1058,49 @@ app.listen(port, () => {
 
 
 
+/*
+Pakhi amader moddhe onek boro misunderstanding hocche. Ajke apnake tumi Kore bolte iccha korteche, tai tumi korei boltechi. Please amr likha gulo poriyen.
 
+Jani, Tumi amr upore onek rege acho. Onek reason ache Tmr rege thakar. But amr Kotha gulo aktu bujhar try korio. Amake vull bujhio na please.
+
+Ami Tmr Sathe ki rude behave Kore felchi? Kno korchi seta kokhono bujhar try korcho tumi?
+
+Akta Kotha boli,  believe korio. Tmi amake onek hurt korcho. Tmi seta hoyto janou na. Bolte gele Ami nijei nijeke hurt korchi tmake valobeshe. Tmi amake just akdom dekhte parta na. Class ar sobar sathe Kotha bolta but amake ignore Kore cholta. Ami Jani Kno tmi serokom korta. Asole Ami deserve kortam se obohela gulo. Amr Tmr proti Kono ovijog nai seta niye karon Ami Jani Ami ki chilam. Kintu tmake aktu aktu Kore onek valobeshe felchilam. Tmake akta din dekhte na parle amr kichu Valo lagto na. Amr Moner moddhe onek Kotha jome chilo. Ami just vabtam Kono akdin sahos Kore hoyto bolte parbo, but sesomoy sei sahos tai hoito na. Pore vabchilam tmake hoyto kokhono bolai hobe na. Tobe Ami sudhu tmakei valobeshe gechilam. Even Tmr sathe koyek mas dekha na holeo sudhu Tmr kothai vabtam. 
+
+Tarpor dhakay chole asar age onek sahos Kore tmake bolei fellam. Kintu thik vabe kichui Korte parii nai. Just vull Kore gechi ar tokhon hoyto Tmr Jonno onek kichu korleo tmi bujhta na. 
+
+Mone ache Tmr Sathe last 10 min Kotha bolte chaichilam. Tmr kache amr Jonno se somoy tukuo kokhono hoyni. Amr onek kichu bolar chilo tmake. But sujog tai paini kokhono.
+
+Tmake purono aisob Kotha bolle tmi rege Jao, ta to pakhi? But aiguloi amr life ta sesh Kore dicchilo last 1 year theke. Amr mathay aiguloi sobsomoy asto, aro koto je Ulta palta vabna, vul val question asto amr mathay! Aigulor Jonno kotogulo rat je Ami ghumaite parii nai seta sudhu Ami janii. 
+
+Ki vabtecho? Tmake aisob boltechi tmr sympathy adayer Jonno? Tmi asole kokhono amake bujhar try koroni. 
+
+Amr jokhon ai problem gulo hoito, Ami nijeke control Korte partam na. Sobar sathe rude behave Kore feltam. Amr friends, family - sobar sathe. Nijeke sekhan theke ber korar jonno onek vabe try korchilam, but hocchilo na.
+
+Tmake Kno aisob boltechi aktu pore bujhte parba.
+
+Akhon sediner kothay asi, Ami ki onek boro vul Kore felchilam? Tomake ki onek beshi hurt Kore felchilam? Tomake oi question gulo kora ki amr uchit hoyni? Bolchilam to tomake je Kno Ami ask korchilam. Ami vabini je tmi atota rege jaba.
+
+But jokhon bujhte parlam je tmi rege gecho, Ami onekbar sorry bolchi. Tmake onekbabe bujhanor try korchi, tmake kotogulo message dichilam. But tmi amr message gulo seen kortechila na, seen korleo Kono reply dicchila na. Ami sudhu sorry bole gechi, Tmr rag ta komanor Jonno try Kore gechi but tmi amke aktukuo bujhar try koroni. 
+
+Kokhono karo kache ignored hoicho tmi? Tahole kivabe bujhba je kirokom lage! Ar Ami to atogulo year theke Tmr kache just obohelito hoyei jacchi.
+
+Akhon abar serokomi kichu hocchilo, Ami tmake atogulo message diye jacchilam but tmi seen porjonto kortechila na. 
+
+Amr sei purono Kotha gulo mone portrchilo and amr matha kaj kortechilo na. Amr abar sei problem gulo hocchilo. Abar sobar sathe kharap behave Kore feltechilam. Tmi amr Sathe Kotha na bolle Ami ki rokom janii hoye jai. Kichu Valo Lage na amr. 
+
+Aigulor jonnoi hoyto Tmr Sathe majhe moddhe rude behave Kore feli. I'm sorry pakhi. Tmr Sathe Ami rude behave Korte chai na, but amr sei problem gulo hole Ami vul Kore feli. Abar kichukkhon por bujhtei parii. Tar jonno sorry Oo boli tmake.
+
+Tmake ajonnoi sei purono Kotha gulo bollam. Oigulor jonnoi Ami vul Kore feli. 
+
+Akhon bujhcho Kno Ami kalke tmr Sathe aktu ba onekta rude behave Kore felchilam. 
+
+I'm sorry
+
+Ami tmake hariye felte chai na. Khub voy hocche amr. Janii Ami hoyto onek beshi vul Kore felchi, Ami hoyto sorry bolaro joggo na. Barbar sorry bole abar vul Kore feli.
+
+
+*/
 
 
 
