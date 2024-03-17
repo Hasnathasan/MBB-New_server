@@ -179,15 +179,7 @@ async function run() {
         res.status(500).json({ error: "Internal server error" });
       }
     });
-    app.get("/ordersLength", async (req, res) => {
-      try {
-        const productsCount = await productsCollection.countDocuments();
-        res.json({ length: productsCount });
-      } catch (error) {
-        console.error("Error retrieving product count:", error);
-        res.status(500).json({ error: "Internal server error" });
-      }
-    });
+
 
 
     app.get('/sold-products-count-last-12-months', async (req, res) => {
@@ -890,6 +882,20 @@ async function run() {
       console.log("to delete order", id);
       const filter = { _id: new ObjectId(id) };
       const result = await ordersCollection.deleteOne(filter);
+      res.send(result)
+    })
+
+    app.patch("/orderStatusUpdate/:id", async(req, res) => {
+      const id = req.params.id;
+      const status = req.query.status;
+      console.log(id, status);
+      const filter = {_id: new ObjectId(id)};
+      const updateDoc = {
+        $set:{
+          status
+        }
+      };
+      const result = ordersCollection.updateOne(filter, updateDoc);
       res.send(result)
     })
 
