@@ -834,10 +834,20 @@ async function run() {
       res.send(result)
     })
     app.get("/allOrders", async (req, res) => {
-      const sortCriteria = { createdAt: -1 };
-      const result = await ordersCollection.find().sort(sortCriteria).toArray();
-      res.send(result)
-    })
+      const status = req.query.status;
+      let sortCriteria = { createdAt: -1 };
+    
+      if (status) {
+        // If status is available, include it in the filtering criteria
+        const filterCriteria = { status: status };
+        const result = await ordersCollection.find(filterCriteria).sort(sortCriteria).toArray();
+        res.send(result);
+      } else {
+        // If status is not provided, simply sort by createdAt
+        const result = await ordersCollection.find().sort(sortCriteria).toArray();
+        res.send(result);
+      }
+    });
     app.get("/singleOrder/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -996,6 +1006,15 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+
+
+
+
+
+
+
+
 
 
 
