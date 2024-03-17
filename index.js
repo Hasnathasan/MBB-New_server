@@ -340,6 +340,30 @@ async function run() {
       }
   });
 
+
+
+  app.delete("/deleteCategory/:name", async (req, res) => {
+    const categoryName = req.params.name;
+
+    // Delete the category from categoryCollection
+    const deleteCategoryResult = await categoryCollection.deleteOne({ category: categoryName });
+
+    if (deleteCategoryResult.deletedCount > 0) {
+        // Delete the category from productsCollection
+        const deleteProductsResult = await productsCollection.updateMany(
+            { "product_categories": categoryName }, // Filter products by category name
+            { $pull: { "product_categories": categoryName } } // Remove the category from the product_categories array
+        );
+
+        res.send({ 
+            deletedCategory: deleteCategoryResult, 
+            deletedProducts: deleteProductsResult 
+        });
+    } else {
+        res.status(404).send({ message: "Category not found" });
+    }
+});
+
     app.get("/products", async (req, res) => {
       const { category, priceSlider, minRating, searchQuery } = req.query;
 
@@ -1065,13 +1089,13 @@ Jani, Tumi amr upore onek rege acho. Onek reason ache Tmr rege thakar. But amr K
 
 Ami Tmr Sathe ki rude behave Kore felchi? Kno korchi seta kokhono bujhar try korcho tumi?
 
-Akta Kotha boli,  believe korio. Tmi amake onek hurt korcho. Tmi seta hoyto janou na. Bolte gele Ami nijei nijeke hurt korchi tmake valobeshe. Tmi amake just akdom dekhte parta na. Class ar sobar sathe Kotha bolta but amake ignore Kore cholta. Ami Jani Kno tmi serokom korta. Asole Ami deserve kortam se obohela gulo. Amr Tmr proti Kono ovijog nai seta niye karon Ami Jani Ami ki chilam. Kintu tmake aktu aktu Kore onek valobeshe felchilam. Tmake akta din dekhte na parle amr kichu Valo lagto na. Amr Moner moddhe onek Kotha jome chilo. Ami just vabtam Kono akdin sahos Kore hoyto bolte parbo, but sesomoy sei sahos tai hoito na. Pore vabchilam tmake hoyto kokhono bolai hobe na. Tobe Ami sudhu tmakei valobeshe gechilam. Even Tmr sathe koyek mas dekha na holeo sudhu Tmr kothai vabtam. 
+Akta Kotha boli,  believe korio. Tmi amake onek hurt korcho. Tmi seta hoyto janou na. Bolte gele Ami nijei nijeke hurt korchi tmake valobeshe. Tmi amake just akdom dekhte parta na. Class ar sobar sathe Kotha bolta but amake ignore Kore cholta. Ami Jani Kno tmi serokom korta. Asole Ami sesomoy hoyto deserve kortam se obohela gulo. Amr Tmr proti Kono ovijog nai seta niye karon Ami Jani Ami ki chilam. Kintu tobuo tmake aktu aktu Kore onek valobeshe felchilam. Tmake akta din dekhte na parle amr kichu Valo lagto na. Amr Moner moddhe onek Kotha jome chilo. Ami just vabtam Kono akdin sahos Kore hoyto bolte parbo, but sesomoy sei sahos tai hoito na. Pore vabchilam tmake hoyto kokhono bolai hobe na. Tobe Ami sudhu tmakei valobeshe gechilam. Even Tmr sathe maser por mas dekha na holeo sudhu Tmr kothai vabtam. 
 
-Tarpor dhakay chole asar age onek sahos Kore tmake bolei fellam. Kintu thik vabe kichui Korte parii nai. Just vull Kore gechi ar tokhon hoyto Tmr Jonno onek kichu korleo tmi bujhta na. 
+Tarpor dhakay chole asar age onek sahos Kore tmake bolei fellam. Kintu thik vabe kichui Korte parii niii tokhon. Just vull Kore gechi ar tokhon hoyto Tmr Jonno onek kichu korleo tmi bujhta na. 
 
-Mone ache Tmr Sathe last 10 min Kotha bolte chaichilam. Tmr kache amr Jonno se somoy tukuo kokhono hoyni. Amr onek kichu bolar chilo tmake. But sujog tai paini kokhono.
+Mone ache Tmr Sathe last 10 min Kotha bolte chaichilam ami. Tmr kache amr Jonno se somoy tukuo kokhono hoyni. Amr onek kichu bolar chilo tmake. But sujog tai paini kokhono.
 
-Tmake purono aisob Kotha bolle tmi rege Jao, ta to pakhi? But aiguloi amr life ta sesh Kore dicchilo last 1 year theke. Amr mathay aiguloi sobsomoy asto, aro koto je Ulta palta vabna, vul val question asto amr mathay! Aigulor Jonno kotogulo rat je Ami ghumaite parii nai seta sudhu Ami janii. 
+Tmake purono aisob Kotha bolle tmi rege Jao, tai to pakhi? But aiguloi amr life ta sesh Kore dicchilo last 1 year theke. Amr mathay aiguloi sobsomoy asto, aro koto je Ulta palta vabna, vul val question asto amr mathay! Aigulor Jonno kotogulo rat je Ami ghumaite parii nai seta sudhu Ami janii. 
 
 Ki vabtecho? Tmake aisob boltechi tmr sympathy adayer Jonno? Tmi asole kokhono amake bujhar try koroni. 
 
@@ -1083,21 +1107,22 @@ Akhon sediner kothay asi, Ami ki onek boro vul Kore felchilam? Tomake ki onek be
 
 But jokhon bujhte parlam je tmi rege gecho, Ami onekbar sorry bolchi. Tmake onekbabe bujhanor try korchi, tmake kotogulo message dichilam. But tmi amr message gulo seen kortechila na, seen korleo Kono reply dicchila na. Ami sudhu sorry bole gechi, Tmr rag ta komanor Jonno try Kore gechi but tmi amke aktukuo bujhar try koroni. 
 
-Kokhono karo kache ignored hoicho tmi? Tahole kivabe bujhba je kirokom lage! Ar Ami to atogulo year theke Tmr kache just obohelito hoyei jacchi.
+Kokhono karo kache ignored hoicho tmi? Tahole kivabe bujhba je kirokom lage amr! Ar Ami to atogulo year theke Tmr kache just obohelito hoyei jacchi.
 
 Akhon abar serokomi kichu hocchilo, Ami tmake atogulo message diye jacchilam but tmi seen porjonto kortechila na. 
 
-Amr sei purono Kotha gulo mone portrchilo and amr matha kaj kortechilo na. Amr abar sei problem gulo hocchilo. Abar sobar sathe kharap behave Kore feltechilam. Tmi amr Sathe Kotha na bolle Ami ki rokom janii hoye jai. Kichu Valo Lage na amr. 
+Amr sei purono Kotha gulo mone portrchilo and amr matha kaj kortechilo na. Amr abar sei problem gulo hocchilo. Abar sobar sathe kharap behave Kore feltechilam. Tmi amr Sathe Kotha na bolle Ami ki rokom janii hoye jai. Kichu Valo Lage na amr. Amr je ki hoy seta ami tmake kokhono bujhaite parbo na ba tmi kokhono hoy bujhar try korba na.
 
 Aigulor jonnoi hoyto Tmr Sathe majhe moddhe rude behave Kore feli. I'm sorry pakhi. Tmr Sathe Ami rude behave Korte chai na, but amr sei problem gulo hole Ami vul Kore feli. Abar kichukkhon por bujhtei parii. Tar jonno sorry Oo boli tmake.
 
-Tmake ajonnoi sei purono Kotha gulo bollam. Oigulor jonnoi Ami vul Kore feli. 
+Tmake ajonnoi sei purono Kotha gulo bollam. Oigulor jonnoi Ami barbar vul Kore feli. 
 
-Akhon bujhcho Kno Ami kalke tmr Sathe aktu ba onekta rude behave Kore felchilam. 
+Akhon bujhcho Kno Ami kalke tmr Sathe aktu ba onekta rude behave Kore felchilam. Tmr sathe aktu kotha bolar jonno ami kotovabe try kore jacchilam but tmi just ingore kortechila amake.
 
-I'm sorry
 
-Ami tmake hariye felte chai na. Khub voy hocche amr. Janii Ami hoyto onek beshi vul Kore felchi, Ami hoyto sorry bolaro joggo na. Barbar sorry bole abar vul Kore feli.
+Ami tmake hariye felte chai na. Khub voy hocche amr. Janii Ami hoyto onek beshi vul Kore felchi, Ami hoyto sorry bolaro joggo na. Barbar sorry bole abar vul Kore feli. But ki korbo bolo to, Tumi amr sathe kotha na bolle ami onno rokom hoye jai.
+
+Kokhono amr dik theke aktabar vebe dekhio. Atota obohelito hote kar valo lage pakhi? 
 
 
 */
