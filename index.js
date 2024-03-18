@@ -1002,6 +1002,27 @@ async function run() {
       res.send(result);
     });
 
+
+    app.get('/sales-report/:artistEmail', async (req, res) => {
+      const artistEmail = req.params.artistEmail;
+    
+      try {
+        // Find orders where the artist's email matches
+        const orders = await ordersCollection.find({ 'products.artist_details.artist': artistEmail }).toArray();
+    console.log(orders);
+        // Extract products sold by the artist from the orders
+        const artistProducts = orders.reduce((acc, order) => {
+          const products = order.products.filter(product => product.artist_details.artist === artistEmail);
+          return acc.concat(products);
+        }, []);
+    
+        res.json(artistProducts);
+      } catch (error) {
+        console.error('Error retrieving artist products:', error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    });
+
     app.get('/artist-sales/:artistEmail', async (req, res) => {
       try {
         const artistEmail = req.params.artistEmail;
