@@ -83,6 +83,7 @@ async function run() {
     const cartsCollection = db.collection("cart");
     const ordersCollection = db.collection("orders");
     const categoryCollection = db.collection("categories");
+    const salesReportCollection = db.collection('sales-report');
 
 
 
@@ -1003,22 +1004,46 @@ async function run() {
     });
 
 
-    app.get('/sales-report/:artistEmail', async (req, res) => {
-      const artistEmail = req.params.artistEmail;
-    
+    app.get('/sales-report', async (req, res) => {
+      const artistEmail = req.query.artistEmail;
+      console.log(artistEmail);
+    if(!artistEmail)
+    return res.status(500).json({ error: 'No Email Found' });
       try {
         // Find orders where the artist's email matches
         const orders = await ordersCollection.find({ 'products.artist_details.artist': artistEmail }).toArray();
-    console.log(orders);
+    
         // Extract products sold by the artist from the orders
         const artistProducts = orders.reduce((acc, order) => {
           const products = order.products.filter(product => product.artist_details.artist === artistEmail);
           return acc.concat(products);
         }, []);
     
-        res.json(artistProducts);
+        // Insert products into sales-report collection if they don't already exist
+    
+        const existingProducts = await salesReportCollection.find({ 'products.product_id': { $in: artistProducts.map(p => p.product_id) } }).toArray();
+        const existingProductIds = new Set(existingProducts.flatMap(p => p.products.map(p => p.product_id)));
+    
+        const productsToInsert = artistProducts.filter(product => !existingProductIds.has(product.product_id));
+    
+        if (productsToInsert.length > 0) {
+          // Add new properties isPaid and isReportGenerated to each product
+          const modifiedProducts = productsToInsert.map(product => ({
+            ...product,
+            isPaid: false,
+            isReportGenerated: false
+          }));
+    
+          // Insert products into sales-report collection
+          await salesReportCollection.insertOne({ artistEmail, products: modifiedProducts });
+        }
+    
+        // Fetch products again by artist email
+        const insertedProducts = await salesReportCollection.findOne({ artistEmail });
+    
+        res.json(insertedProducts);
       } catch (error) {
-        console.error('Error retrieving artist products:', error);
+        console.error('Error retrieving and inserting artist products:', error);
         res.status(500).json({ error: 'Internal server error' });
       }
     });
