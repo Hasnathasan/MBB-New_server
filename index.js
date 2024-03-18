@@ -184,66 +184,66 @@ async function run() {
 
     app.get('/sold-products-count-last-12-months', async (req, res) => {
       try {
-          // Calculate the start date (first day of the current month 12 months ago)
-          const startDate = new Date();
-          startDate.setMonth(startDate.getMonth() - 11);
-          startDate.setDate(1);
-          // Calculate the end date (last day of the current month)
-          const endDate = new Date();
-          endDate.setHours(23, 59, 59, 999);
+        // Calculate the start date (first day of the current month 12 months ago)
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 11);
+        startDate.setDate(1);
+        // Calculate the end date (last day of the current month)
+        const endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
 
-          // Aggregate orders for the last 12 months
-          const soldProductsLast12Months = await db.collection('orders').aggregate([
-              {
-                  $match: {
-                      createdAt: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } // Filter orders within the last 12 months
-                  }
+        // Aggregate orders for the last 12 months
+        const soldProductsLast12Months = await db.collection('orders').aggregate([
+          {
+            $match: {
+              createdAt: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } // Filter orders within the last 12 months
+            }
+          },
+          {
+            $unwind: "$products" // Unwind the products array
+          },
+          {
+            $group: {
+              _id: {
+                month: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
               },
-              {
-                  $unwind: "$products" // Unwind the products array
-              },
-              {
-                  $group: {
-                      _id: {
-                          month: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
-                      },
-                      totalQuantity: { $sum: "$products.quantity" } // Sum the quantity of sold products
-                  }
-              },
-              {
-                  $sort: { "_id.month": 1 } // Sort by month
-              }
-          ]).toArray();
-
-          // Construct response object with sold product count for each month of the last 12 months
-          const soldProductsCountLast12Months = {};
-
-          // Iterate over all 12 months
-          for (let i = 0; i < 12; i++) {
-              // Calculate the month for the current iteration
-              const monthYearKey = new Date(startDate);
-              monthYearKey.setMonth(startDate.getMonth() + i);
-              const month = monthYearKey.toLocaleString('en-us', { month: 'short' });
-
-              // Initialize the count for the current month to 0
-              soldProductsCountLast12Months[month] = 0;
+              totalQuantity: { $sum: "$products.quantity" } // Sum the quantity of sold products
+            }
+          },
+          {
+            $sort: { "_id.month": 1 } // Sort by month
           }
+        ]).toArray();
 
-          // Update counts for existing months
-          soldProductsLast12Months.forEach(monthData => {
-              const month = new Date(startDate);
-              month.setMonth(monthData._id.month - 1);
-              const monthName = month.toLocaleString('en-us', { month: 'short' });
+        // Construct response object with sold product count for each month of the last 12 months
+        const soldProductsCountLast12Months = {};
 
-              soldProductsCountLast12Months[monthName] = monthData.totalQuantity;
-          });
+        // Iterate over all 12 months
+        for (let i = 0; i < 12; i++) {
+          // Calculate the month for the current iteration
+          const monthYearKey = new Date(startDate);
+          monthYearKey.setMonth(startDate.getMonth() + i);
+          const month = monthYearKey.toLocaleString('en-us', { month: 'short' });
 
-          res.json(soldProductsCountLast12Months);
+          // Initialize the count for the current month to 0
+          soldProductsCountLast12Months[month] = 0;
+        }
+
+        // Update counts for existing months
+        soldProductsLast12Months.forEach(monthData => {
+          const month = new Date(startDate);
+          month.setMonth(monthData._id.month - 1);
+          const monthName = month.toLocaleString('en-us', { month: 'short' });
+
+          soldProductsCountLast12Months[monthName] = monthData.totalQuantity;
+        });
+
+        res.json(soldProductsCountLast12Months);
       } catch (error) {
-          console.error('Error fetching sold products count for the last 12 months:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error fetching sold products count for the last 12 months:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
       }
-  });
+    });
 
 
 
@@ -303,66 +303,66 @@ async function run() {
       const image = categoryToUpdate?.image;
       const id = categoryToUpdate?.id;
       console.log(categoryToUpdate, image);
-  
+
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
-          $set: {
-              category 
-          }
+        $set: {
+          category
+        }
       };
-  
+
       if (image) {
-          updateDoc.$set.image = image;
+        updateDoc.$set.image = image;
       }
-  
+
       // Update the category
       const result = await categoryCollection.updateOne(filter, updateDoc);
-  if(previousCategory == category){
-    return res.send({ 
-      updatedCategory: result
-  });
-  }
+      if (previousCategory == category) {
+        return res.send({
+          updatedCategory: result
+        });
+      }
       // If the category was updated successfully
       if (result.modifiedCount > 0) {
-          // Update products with the new category (case insensitive)
-          const productsUpdateResult = await productsCollection.updateMany(
-              { "product_categories": previousCategory }, // Filter products by previous category
-              { $set: { "product_categories.$[elem]": category } }, // Update matched category
-              { arrayFilters: [{ "elem": { $regex: new RegExp('^' + previousCategory + '$', "i") } }] } // Case insensitive regex
-          );
-          
-          res.send({ 
-              updatedCategory: result, 
-              updatedProducts: productsUpdateResult 
-          });
-      } else {
-          res.status(404).send({ message: "Category not found" });
-      }
-  });
-
-
-
-  app.delete("/deleteCategory/:name", async (req, res) => {
-    const categoryName = req.params.name;
-
-    // Delete the category from categoryCollection
-    const deleteCategoryResult = await categoryCollection.deleteOne({ category: categoryName });
-
-    if (deleteCategoryResult.deletedCount > 0) {
-        // Delete the category from productsCollection
-        const deleteProductsResult = await productsCollection.updateMany(
-            { "product_categories": categoryName }, // Filter products by category name
-            { $pull: { "product_categories": categoryName } } // Remove the category from the product_categories array
+        // Update products with the new category (case insensitive)
+        const productsUpdateResult = await productsCollection.updateMany(
+          { "product_categories": previousCategory }, // Filter products by previous category
+          { $set: { "product_categories.$[elem]": category } }, // Update matched category
+          { arrayFilters: [{ "elem": { $regex: new RegExp('^' + previousCategory + '$', "i") } }] } // Case insensitive regex
         );
 
-        res.send({ 
-            deletedCategory: deleteCategoryResult, 
-            deletedProducts: deleteProductsResult 
+        res.send({
+          updatedCategory: result,
+          updatedProducts: productsUpdateResult
         });
-    } else {
+      } else {
         res.status(404).send({ message: "Category not found" });
-    }
-});
+      }
+    });
+
+
+
+    app.delete("/deleteCategory/:name", async (req, res) => {
+      const categoryName = req.params.name;
+
+      // Delete the category from categoryCollection
+      const deleteCategoryResult = await categoryCollection.deleteOne({ category: categoryName });
+
+      if (deleteCategoryResult.deletedCount > 0) {
+        // Delete the category from productsCollection
+        const deleteProductsResult = await productsCollection.updateMany(
+          { "product_categories": categoryName }, // Filter products by category name
+          { $pull: { "product_categories": categoryName } } // Remove the category from the product_categories array
+        );
+
+        res.send({
+          deletedCategory: deleteCategoryResult,
+          deletedProducts: deleteProductsResult
+        });
+      } else {
+        res.status(404).send({ message: "Category not found" });
+      }
+    });
 
     app.get("/products", async (req, res) => {
       const { category, priceSlider, minRating, searchQuery } = req.query;
@@ -588,7 +588,7 @@ async function run() {
 
     app.get("/popularArtist", async (req, res) => {
       const sort = { total_products: -1 };
-      const result = await usersCollection.find({"userRole": "artist"}, 'email userName userPhoto _id').sort(sort).limit(12).toArray();
+      const result = await usersCollection.find({ "userRole": "artist" }, 'email userName userPhoto _id').sort(sort).limit(12).toArray();
       res.send(result)
     })
 
@@ -605,62 +605,62 @@ async function run() {
 
     app.get('/orders-last-12-months', async (req, res) => {
       try {
-          // Calculate the start date (first day of the current month 12 months ago)
-          const startDate = new Date();
-          startDate.setMonth(startDate.getMonth() - 11);
-          startDate.setDate(1);
-          // Calculate the end date (last day of the current month)
-          const endDate = new Date();
-          endDate.setHours(23, 59, 59, 999);
+        // Calculate the start date (first day of the current month 12 months ago)
+        const startDate = new Date();
+        startDate.setMonth(startDate.getMonth() - 11);
+        startDate.setDate(1);
+        // Calculate the end date (last day of the current month)
+        const endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
 
-          // Aggregate orders for the last 12 months
-          const ordersLast12Months = await db.collection('orders').aggregate([
-              {
-                  $match: {
-                      createdAt: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } // Filter orders within the last 12 months
-                  }
+        // Aggregate orders for the last 12 months
+        const ordersLast12Months = await db.collection('orders').aggregate([
+          {
+            $match: {
+              createdAt: { $gte: startDate.toISOString(), $lte: endDate.toISOString() } // Filter orders within the last 12 months
+            }
+          },
+          {
+            $group: {
+              _id: {
+                month: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
+                year: { $year: { $dateFromString: { dateString: "$createdAt" } } } // Extract year from the date string
               },
-              {
-                  $group: {
-                      _id: {
-                          month: { $month: { $dateFromString: { dateString: "$createdAt" } } }, // Extract month from the date string
-                          year: { $year: { $dateFromString: { dateString: "$createdAt" } } } // Extract year from the date string
-                      },
-                      count: { $sum: 1 } // Count number of orders in each month and year
-                  }
-              },
-              {
-                  $sort: { "_id.year": 1, "_id.month": 1 } // Sort by year and month
-              }
-          ]).toArray();
-
-          // Construct response object with counts for each month of the last 12 months
-          const ordersCountLast12Months = {};
-
-          // Iterate over all 12 months
-          for (let i = 0; i < 12; i++) {
-              // Calculate the month and year for the current iteration
-              const monthYearKey = new Date(startDate);
-              monthYearKey.setMonth(startDate.getMonth() + i);
-              const month = monthYearKey.toLocaleString('en-us', { month: 'short' });
-              const year = monthYearKey.getFullYear();
-
-              // Initialize the count for the current month to 0
-              ordersCountLast12Months[month] = 0;
+              count: { $sum: 1 } // Count number of orders in each month and year
+            }
+          },
+          {
+            $sort: { "_id.year": 1, "_id.month": 1 } // Sort by year and month
           }
+        ]).toArray();
 
-          // Update counts for existing months
-          ordersLast12Months.forEach(monthYear => {
-              const month = new Date(`${monthYear._id.year}-${monthYear._id.month}-01`).toLocaleString('en-us', { month: 'short' });
-              ordersCountLast12Months[month] = monthYear.count;
-          });
+        // Construct response object with counts for each month of the last 12 months
+        const ordersCountLast12Months = {};
 
-          res.json(ordersCountLast12Months);
+        // Iterate over all 12 months
+        for (let i = 0; i < 12; i++) {
+          // Calculate the month and year for the current iteration
+          const monthYearKey = new Date(startDate);
+          monthYearKey.setMonth(startDate.getMonth() + i);
+          const month = monthYearKey.toLocaleString('en-us', { month: 'short' });
+          const year = monthYearKey.getFullYear();
+
+          // Initialize the count for the current month to 0
+          ordersCountLast12Months[month] = 0;
+        }
+
+        // Update counts for existing months
+        ordersLast12Months.forEach(monthYear => {
+          const month = new Date(`${monthYear._id.year}-${monthYear._id.month}-01`).toLocaleString('en-us', { month: 'short' });
+          ordersCountLast12Months[month] = monthYear.count;
+        });
+
+        res.json(ordersCountLast12Months);
       } catch (error) {
-          console.error('Error fetching orders for the last 12 months:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
+        console.error('Error fetching orders for the last 12 months:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
       }
-  });
+    });
 
 
     app.get("/popularCategories", async (req, res) => {
@@ -685,7 +685,7 @@ async function run() {
           { $project: { _id: 0, category: '$_id', image: 1, count: '$matchedCount' } }, // Rename _id to category and include count
           { $limit: 12 }
         ]).toArray();
-  
+
         // Save or update categories in categoryCollection
         for (const category of popularCategories) {
           const existingCategory = await categoryCollection.findOne({ category: category.category });
@@ -700,9 +700,9 @@ async function run() {
             await categoryCollection.insertOne(category);
           }
         }
-  
-        const allCategories = await categoryCollection.find().sort({count: -1}).toArray();
-    res.json(allCategories);
+
+        const allCategories = await categoryCollection.find().sort({ count: -1 }).toArray();
+        res.json(allCategories);
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });
@@ -714,25 +714,25 @@ async function run() {
       try {
         const categoryName = req.params.categoryName;
         const { category, image } = req.body;
-    
+
         // Check if the category exists
         const existingCategory = await categoryCollection.findOne({ category: { $regex: new RegExp(`^${categoryName}$`, 'i') } });
-    
+
         if (!existingCategory) {
           return res.status(404).json({ message: 'Category not found' });
         }
-    
+
         // Update the category data
         const updatedData = {};
         if (category) updatedData.category = category.toLowerCase();
         if (image) updatedData.image = image;
-    
+
         // Perform the update
         await categoryCollection.updateOne(
           { category: { $regex: new RegExp(`^${categoryName}$`, 'i') } },
           { $set: updatedData }
         );
-    
+
         res.json({ message: 'Category updated successfully' });
       } catch (err) {
         console.error(err);
@@ -744,17 +744,17 @@ async function run() {
     app.post("/categories", async (req, res) => {
       try {
         const { category, image } = req.body;
-    
+
         // Check if the category already exists in a case-insensitive manner
         const existingCategory = await categoryCollection.findOne({ category: { $regex: new RegExp(`^${category}$`, 'i') } });
-    
+
         if (existingCategory) {
           return res.status(400).json({ message: 'Category already exists' });
         }
-    
+
         // Insert the new category into the database
         await categoryCollection.insertOne({ category: category.toLowerCase(), image });
-    
+
         res.status(201).json({ message: 'Category added successfully' });
       } catch (err) {
         console.error(err);
@@ -840,59 +840,59 @@ async function run() {
 
     app.patch("/reviews/:product_id", async (req, res) => {
       try {
-          const reviewByUser = req.body;
-          const product_id = req.params.product_id;
-  
-          // Assuming your MongoDB client is initialized and stored in a variable called 'db'
-  
-          // Filter to find the product by its ID
-          const filter = { _id: new ObjectId(product_id) };
-  
-          // Update operation to push the new review to the beginning of the array
-          const update = {
-              $push: {
-                  reviews: {
-                      $each: [reviewByUser], // new review to be added
-                      $position: 0 // add it to the beginning of the array
-                  }
-              }
-          };
-  
-          // Perform the update
-          const result = await productsCollection.updateOne(filter, update);
-  
-          // Check if the update was successful
-          if (result.modifiedCount === 1) {
-              // Recalculate product rating
-              const product = await productsCollection.findOne(filter);
-              const reviews = product.reviews || [];
-              const totalReviews = reviews.length;
-              let totalRating = 0;
-  
-              // Calculate total rating from all reviews
-              reviews.forEach(review => {
-                  totalRating += review.rating;
-              });
-  
-              // Calculate the average rating
-              const averageRating = totalRating / totalReviews;
-  
-              // Update product rating
-              await productsCollection.updateOne(filter, {
-                  $set: {
-                      rating: averageRating
-                  }
-              });
-  
-              res.status(200).send("Review added successfully");
-          } else {
-              res.status(404).send("Product not found");
+        const reviewByUser = req.body;
+        const product_id = req.params.product_id;
+
+        // Assuming your MongoDB client is initialized and stored in a variable called 'db'
+
+        // Filter to find the product by its ID
+        const filter = { _id: new ObjectId(product_id) };
+
+        // Update operation to push the new review to the beginning of the array
+        const update = {
+          $push: {
+            reviews: {
+              $each: [reviewByUser], // new review to be added
+              $position: 0 // add it to the beginning of the array
+            }
           }
+        };
+
+        // Perform the update
+        const result = await productsCollection.updateOne(filter, update);
+
+        // Check if the update was successful
+        if (result.modifiedCount === 1) {
+          // Recalculate product rating
+          const product = await productsCollection.findOne(filter);
+          const reviews = product.reviews || [];
+          const totalReviews = reviews.length;
+          let totalRating = 0;
+
+          // Calculate total rating from all reviews
+          reviews.forEach(review => {
+            totalRating += review.rating;
+          });
+
+          // Calculate the average rating
+          const averageRating = totalRating / totalReviews;
+
+          // Update product rating
+          await productsCollection.updateOne(filter, {
+            $set: {
+              rating: averageRating
+            }
+          });
+
+          res.status(200).send("Review added successfully");
+        } else {
+          res.status(404).send("Product not found");
+        }
       } catch (error) {
-          console.error("Error updating review:", error);
-          res.status(500).send("Internal Server Error");
+        console.error("Error updating review:", error);
+        res.status(500).send("Internal Server Error");
       }
-  });
+    });
 
     app.get("/orders/:email", async (req, res) => {
       const email = req.params.email;
@@ -904,7 +904,7 @@ async function run() {
     app.get("/allOrders", async (req, res) => {
       const status = req.query.status;
       let sortCriteria = { createdAt: -1 };
-    
+
       if (status) {
         // If status is available, include it in the filtering criteria
         const filterCriteria = { status: status };
@@ -926,34 +926,34 @@ async function run() {
 
     app.post("/orders", async (req, res) => {
       try {
-          const order = req.body;
-          const products = order.products;
-  console.log(order);
-          // Check each product in the order
-          for (const product of products) {
-              const { product_id, quantity } = product;
-  
-              // Check if product exists in productsCollection
-              const existingProduct = await productsCollection.findOne({ _id: new ObjectId(product_id) });
-              console.log(existingProduct);
-              if (!existingProduct) {
-                  return res.status(500).send({message: `Product with ID ${product_id} not found`});
-              }
-  
-              // Check if available_quantity is sufficient
-              if (existingProduct.available_quantity < quantity) {
-                  return res.status(400).send({message: `Insufficient quantity for product ${product_id}`});
-              }
+        const order = req.body;
+        const products = order.products;
+        console.log(order);
+        // Check each product in the order
+        for (const product of products) {
+          const { product_id, quantity } = product;
+
+          // Check if product exists in productsCollection
+          const existingProduct = await productsCollection.findOne({ _id: new ObjectId(product_id) });
+          console.log(existingProduct);
+          if (!existingProduct) {
+            return res.status(500).send({ message: `Product with ID ${product_id} not found` });
           }
-  
-          // If all products are available and have sufficient quantity, insert the order
-          const result = await ordersCollection.insertOne(order);
-          res.status(201).send(result);
+
+          // Check if available_quantity is sufficient
+          if (existingProduct.available_quantity < quantity) {
+            return res.status(400).send({ message: `Insufficient quantity for product ${product_id}` });
+          }
+        }
+
+        // If all products are available and have sufficient quantity, insert the order
+        const result = await ordersCollection.insertOne(order);
+        res.status(201).send(result);
       } catch (error) {
-          console.error(error);
-          res.status(500).send({message:'Internal server error'});
+        console.error(error);
+        res.status(500).send({ message: 'Internal server error' });
       }
-  });
+    });
 
     app.delete("/orders/:id", async (req, res) => {
       const id = req.params.id;
@@ -963,13 +963,13 @@ async function run() {
       res.send(result)
     })
 
-    app.patch("/orderStatusUpdate/:id", async(req, res) => {
+    app.patch("/orderStatusUpdate/:id", async (req, res) => {
       const id = req.params.id;
       const status = req.query.status;
       console.log(id, status);
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const updateDoc = {
-        $set:{
+        $set: {
           status
         }
       };
@@ -983,7 +983,7 @@ async function run() {
       const updatePromises = products.map(async product => {
         const query = { _id: new ObjectId(product?.product_id) };
         const updateDocForProduct = {
-          $inc: { available_quantity: -product?.quantity } 
+          $inc: { available_quantity: -product?.quantity }
         };
         return await productsCollection.updateOne(query, updateDocForProduct);
       });
@@ -1017,7 +1017,7 @@ async function run() {
         let totalArtistProfit = 0;
         let totalWebsiteProfit = 0;
         let totalPrisonProfit = 0;
-    
+
         // Calculate total profits
         orders.forEach(order => {
           order.products.forEach(product => {
@@ -1032,7 +1032,7 @@ async function run() {
             }
           });
         });
-    
+
         res.json({
           artistEmail,
           totalArtistProfit,
@@ -1082,50 +1082,7 @@ app.listen(port, () => {
 
 
 
-/*
-Pakhi amader moddhe onek boro misunderstanding hocche. Ajke apnake tumi Kore bolte iccha korteche, tai tumi korei boltechi. Please amr likha gulo poriyen.
 
-Jani, Tumi amr upore onek rege acho. Onek reason ache Tmr rege thakar. But amr Kotha gulo aktu bujhar try korio. Amake vull bujhio na please.
-
-Ami Tmr Sathe ki rude behave Kore felchi? Kno korchi seta kokhono bujhar try korcho tumi?
-
-Akta Kotha boli,  believe korio. Tmi amake onek hurt korcho. Tmi seta hoyto janou na. Bolte gele Ami nijei nijeke hurt korchi tmake valobeshe. Tmi amake just akdom dekhte parta na. Class ar sobar sathe Kotha bolta but amake ignore Kore cholta. Ami Jani Kno tmi serokom korta. Asole Ami sesomoy hoyto deserve kortam se obohela gulo. Amr Tmr proti Kono ovijog nai seta niye karon Ami Jani Ami ki chilam. Kintu tobuo tmake aktu aktu Kore onek valobeshe felchilam. Tmake akta din dekhte na parle amr kichu Valo lagto na. Amr Moner moddhe onek Kotha jome chilo. Ami just vabtam Kono akdin sahos Kore hoyto bolte parbo, but sesomoy sei sahos tai hoito na. Pore vabchilam tmake hoyto kokhono bolai hobe na. Tobe Ami sudhu tmakei valobeshe gechilam. Even Tmr sathe maser por mas dekha na holeo sudhu Tmr kothai vabtam. 
-
-Tarpor dhakay chole asar age onek sahos Kore tmake bolei fellam. Kintu thik vabe kichui Korte parii niii tokhon. Just vull Kore gechi ar tokhon hoyto Tmr Jonno onek kichu korleo tmi bujhta na. 
-
-Mone ache Tmr Sathe last 10 min Kotha bolte chaichilam ami. Tmr kache amr Jonno se somoy tukuo kokhono hoyni. Amr onek kichu bolar chilo tmake. But sujog tai paini kokhono.
-
-Tmake purono aisob Kotha bolle tmi rege Jao, tai to pakhi? But aiguloi amr life ta sesh Kore dicchilo last 1 year theke. Amr mathay aiguloi sobsomoy asto, aro koto je Ulta palta vabna, vul val question asto amr mathay! Aigulor Jonno kotogulo rat je Ami ghumaite parii nai seta sudhu Ami janii. 
-
-Ki vabtecho? Tmake aisob boltechi tmr sympathy adayer Jonno? Tmi asole kokhono amake bujhar try koroni. 
-
-Amr jokhon ai problem gulo hoito, Ami nijeke control Korte partam na. Sobar sathe rude behave Kore feltam. Amr friends, family - sobar sathe. Nijeke sekhan theke ber korar jonno onek vabe try korchilam, but hocchilo na.
-
-Tmake Kno aisob boltechi aktu pore bujhte parba.
-
-Akhon sediner kothay asi, Ami ki onek boro vul Kore felchilam? Tomake ki onek beshi hurt Kore felchilam? Tomake oi question gulo kora ki amr uchit hoyni? Bolchilam to tomake je Kno Ami ask korchilam. Ami vabini je tmi atota rege jaba.
-
-But jokhon bujhte parlam je tmi rege gecho, Ami onekbar sorry bolchi. Tmake onekbabe bujhanor try korchi, tmake kotogulo message dichilam. But tmi amr message gulo seen kortechila na, seen korleo Kono reply dicchila na. Ami sudhu sorry bole gechi, Tmr rag ta komanor Jonno try Kore gechi but tmi amke aktukuo bujhar try koroni. 
-
-Kokhono karo kache ignored hoicho tmi? Tahole kivabe bujhba je kirokom lage amr! Ar Ami to atogulo year theke Tmr kache just obohelito hoyei jacchi.
-
-Akhon abar serokomi kichu hocchilo, Ami tmake atogulo message diye jacchilam but tmi seen porjonto kortechila na. 
-
-Amr sei purono Kotha gulo mone portrchilo and amr matha kaj kortechilo na. Amr abar sei problem gulo hocchilo. Abar sobar sathe kharap behave Kore feltechilam. Tmi amr Sathe Kotha na bolle Ami ki rokom janii hoye jai. Kichu Valo Lage na amr. Amr je ki hoy seta ami tmake kokhono bujhaite parbo na ba tmi kokhono hoy bujhar try korba na.
-
-Aigulor jonnoi hoyto Tmr Sathe majhe moddhe rude behave Kore feli. I'm sorry pakhi. Tmr Sathe Ami rude behave Korte chai na, but amr sei problem gulo hole Ami vul Kore feli. Abar kichukkhon por bujhtei parii. Tar jonno sorry Oo boli tmake.
-
-Tmake ajonnoi sei purono Kotha gulo bollam. Oigulor jonnoi Ami barbar vul Kore feli. 
-
-Akhon bujhcho Kno Ami kalke tmr Sathe aktu ba onekta rude behave Kore felchilam. Tmr sathe aktu kotha bolar jonno ami kotovabe try kore jacchilam but tmi just ingore kortechila amake.
-
-
-Ami tmake hariye felte chai na. Khub voy hocche amr. Janii Ami hoyto onek beshi vul Kore felchi, Ami hoyto sorry bolaro joggo na. Barbar sorry bole abar vul Kore feli. But ki korbo bolo to, Tumi amr sathe kotha na bolle ami onno rokom hoye jai.
-
-Kokhono amr dik theke aktabar vebe dekhio. Atota obohelito hote kar valo lage pakhi? 
-
-
-*/
 
 
 
