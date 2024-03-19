@@ -1023,33 +1023,57 @@ async function run() {
       }
       
       try {
-        // Check if there are any unreported products in the salesReportCollection
-        const existingReport = await salesReportCollection.findOne({ artistEmail, isReportGenerated: false });
+        // Check if there are any unreported sales reports for the artist
+        const existingReports = await salesReportCollection.find({ artistEmail, isReportGenerated: false }).toArray();
     
-        if (existingReport) {
-          // If there are unreported products, return them without reinserting
-          return res.json({ _id: existingReport._id, artistEmail, products: existingReport.products, status: 'pending', isReportGenerated: false });
+        if (existingReports.length > 0) {
+          // If there are unreported sales reports, return the first one found
+          return res.json({ _id: existingReports[0]._id, artistEmail, products: existingReports[0].products, status: 'pending', isReportGenerated: false });
         }
         
         // Collect products from ordersCollection for the specified artistEmail
         const orders = await ordersCollection.find({ 'products.artist_details.artist': artistEmail }).toArray();
-        
+        if(orders.length == 0){
+          return res.status(500).json({ error: 'No Orders available for this artist' });
+        }
         // Extract products sold by the artist from the orders and add order_id to each product
         const artistProducts = orders.reduce((acc, order) => {
           const products = order.products.filter(product => product.artist_details.artist === artistEmail);
           return acc.concat(products.map(product => ({ ...product, order_id: order._id.toString() })));
         }, []);
         
-        // Insert new products into the salesReportCollection
-        const insertResult = await salesReportCollection.insertOne({ artistEmail, products: artistProducts, status: 'pending', isReportGenerated: false });
+        // Check for existing products in the salesReportCollection
+        const existingProducts = await salesReportCollection.find({ 'products.order_id': { $in: artistProducts.map(p => p.order_id) } }).toArray();
     
-        // Return the inserted products along with their _id
-        return res.json({ _id: insertResult.insertedId, artistEmail, products: artistProducts, status: 'pending', isReportGenerated: false });
+        if (existingProducts.length > 0) {
+          // If there are existing products, return an empty response
+          return res.json({ message: 'All products are already reported' });
+        }
+        
+        // Insert new sales report into the salesReportCollection
+        const insertResult = await salesReportCollection.insertOne({ artistEmail, products: artistProducts, status: 'unpaid', isReportGenerated: false });
+    
+        // Return the inserted sales report along with its _id
+        return res.json({ _id: insertResult.insertedId, artistEmail, products: artistProducts, status: 'unpaid', isReportGenerated: false });
       } catch (error) {
         console.error('Error retrieving or updating artist products:', error);
         res.status(500).json({ error: 'Internal server error' });
       }
     });
+
+
+
+    app.patch("/sales-report-update/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const updateDoc = {
+        $set: {
+          isReportGenerated: true
+        }
+      }
+      const result = await salesReportCollection.updateOne(filter, updateDoc);
+      res.send(result)
+    })
 
     app.get('/artist-sales/:artistEmail', async (req, res) => {
       try {
