@@ -668,7 +668,12 @@ async function run() {
         console.error('Error fetching orders for the last 12 months:', error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
-    });
+    });   
+
+    app.get("/sales-report-all", async(req,res) =>{
+      const result= await salesReportCollection.find().toArray();
+      res.send(result) 
+    })
 
 
     app.get("/popularCategories", async (req, res) => {
