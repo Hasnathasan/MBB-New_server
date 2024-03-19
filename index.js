@@ -754,9 +754,9 @@ async function run() {
         }
 
         // Insert the new category into the database
-        await categoryCollection.insertOne({ category: category.toLowerCase(), image });
+        const result = await categoryCollection.insertOne({ category: category.toLowerCase(), image });
 
-        res.status(201).json({ message: 'Category added successfully' });
+        res.send(result);
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal server error' });
@@ -1006,9 +1006,7 @@ async function run() {
 
     app.get('/sales-report', async (req, res) => {
       const artistEmail = req.query.artistEmail;
-      console.log(artistEmail);
-    if(!artistEmail)
-    return res.status(500).json({ error: 'No Email Found' });
+    
       try {
         // Find orders where the artist's email matches
         const orders = await ordersCollection.find({ 'products.artist_details.artist': artistEmail }).toArray();
@@ -1016,34 +1014,23 @@ async function run() {
         // Extract products sold by the artist from the orders
         const artistProducts = orders.reduce((acc, order) => {
           const products = order.products.filter(product => product.artist_details.artist === artistEmail);
-          return acc.concat(products);
+          return acc.concat(products.map(product => ({ ...product, order_id: order._id })));
         }, []);
     
-        // Insert products into sales-report collection if they don't already exist
-    
-        const existingProducts = await salesReportCollection.find({ 'products.product_id': { $in: artistProducts.map(p => p.product_id) } }).toArray();
-        const existingProductIds = new Set(existingProducts.flatMap(p => p.products.map(p => p.product_id)));
-    
-        const productsToInsert = artistProducts.filter(product => !existingProductIds.has(product.product_id));
-    
-        if (productsToInsert.length > 0) {
-          // Add new properties isPaid and isReportGenerated to each product
-          const modifiedProducts = productsToInsert.map(product => ({
-            ...product,
-            isPaid: false,
-            isReportGenerated: false
-          }));
-    
-          // Insert products into sales-report collection
-          await salesReportCollection.insertOne({ artistEmail, products: modifiedProducts });
+        // Check if products associated with the order_id are already present in the salesReportCollection
+        const existingProducts = await salesReportCollection.find({ 'products.order_id': { $in: artistProducts.map(p => p.order_id) } }).toArray();
+    console.log(existingProducts, {"ArtistProduct": artistProducts});
+        if (existingProducts.length > 0) {
+          // Filter out products that are not already in the salesReportCollection
+          const existingProductOrderIds = new Set(existingProducts.flatMap(p => p.products.map(p => p.order_id)));
+          const newArtistProducts = artistProducts.filter(product => !existingProductOrderIds.has(product.order_id));
+          return res.json(newArtistProducts);
+        } else {
+          // If no products are found in the salesReportCollection, return all artistProducts
+          return res.json(artistProducts);
         }
-    
-        // Fetch products again by artist email
-        const insertedProducts = await salesReportCollection.findOne({ artistEmail });
-    
-        res.json(insertedProducts);
       } catch (error) {
-        console.error('Error retrieving and inserting artist products:', error);
+        console.error('Error retrieving artist products:', error);
         res.status(500).json({ error: 'Internal server error' });
       }
     });
