@@ -80,7 +80,7 @@ async function run() {
     const usersCollection = db.collection("users");
     const productsCollection = db.collection("products");
     const prisonsCollection = db.collection("prisons");
-    const cartsCollection = db.collection("cart");
+    const wishListCollection = db.collection("wish-list");
     const ordersCollection = db.collection("orders");
     const categoryCollection = db.collection("categories");
     const salesReportCollection = db.collection('sales-report');
@@ -120,6 +120,19 @@ async function run() {
         res.status(500).send('Internal server error');
       }
     });
+
+    app.get("/wish-list-by-email/:email", async(req, res) => {
+      const email = req.params.email;
+      const filter = {addedBy: email};
+      const result = await wishListCollection.find(filter).toArray();
+      res.send(result)
+    })
+
+    app.post("/wish-list", async(req, res) => {
+      const wishItem = req.body;
+      const result = await wishListCollection.insertOne(wishItem);
+      res.send(result)
+    })
 
 
     app.post('/uploadMultiple', async (req, res) => {
