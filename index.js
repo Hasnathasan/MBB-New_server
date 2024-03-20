@@ -670,11 +670,20 @@ async function run() {
       }
     });   
 
-    app.get("/sales-report-all", async(req,res) =>{
-      const result= await salesReportCollection.find().toArray();
+    app.get("/sales-report-all", async(req, res) =>{
+      const status = req.query.status;
+      console.log(status);
+      let filter={};
+      if(status && status == "all"){
+        filter = {}
+      }
+      else if(status){
+        filter = {status}
+      }
+      const result= await salesReportCollection.find(filter).toArray();
       res.send(result) 
     })
-
+ 
 
     app.get("/popularCategories", async (req, res) => {
       try {
@@ -918,7 +927,7 @@ async function run() {
       const status = req.query.status;
       let sortCriteria = { createdAt: -1 };
 
-      if (status) {
+      if (status && status != "all") {
         // If status is available, include it in the filtering criteria
         const filterCriteria = { status: status };
         const result = await ordersCollection.find(filterCriteria).sort(sortCriteria).toArray();
@@ -933,6 +942,20 @@ async function run() {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const result = await ordersCollection.findOne(filter);
+      res.send(result)
+    })
+
+
+    app.patch("/updateProducts/:id", async(req, res) => {
+      const updatedProductData = req.body;
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const updateDoc = {
+        $set: {
+          ...updatedProductData
+        }
+      }
+      const result = await productsCollection.updateOne(filter, updateDoc);
       res.send(result)
     })
 
@@ -1025,50 +1048,51 @@ async function run() {
       try {
         // Check if there are any unreported sales reports for the artist
         const existingReports = await salesReportCollection.find({ artistEmail, isReportGenerated: false }).toArray();
-    
+    // console.log(existingReports);
         if (existingReports.length > 0) {
           // If there are unreported sales reports, return the first one found
-          return res.json({ _id: existingReports[0]._id, artistEmail, products: existingReports[0].products, status: 'pending', isReportGenerated: false });
+          return res.json({ _id: existingReports[0]._id, artistEmail, products: existingReports[0].products, status: existingProducts[0].status, isReportGenerated: false });
         }
         
         // Collect products from ordersCollection for the specified artistEmail
         const orders = await ordersCollection.find({ 'products.artist_details.artist': artistEmail }).toArray();
+        // console.log(orders);
         if(orders.length == 0){
-          return res.status(500).json({ error: 'No Orders available for this artist' });
+          return res.json({products: orders});
         }
         // Extract products sold by the artist from the orders and add order_id to each product
         const artistProducts = orders.reduce((acc, order) => {
           const products = order.products.filter(product => product.artist_details.artist === artistEmail);
           return acc.concat(products.map(product => ({ ...product, order_id: order._id.toString() })));
         }, []);
-        
+        // console.log(artistProducts);
         // Check for existing products in the salesReportCollection
         const existingProducts = await salesReportCollection.find({ 'products.order_id': { $in: artistProducts.map(p => p.order_id) } }).toArray();
-    
-        if (existingProducts.length > 0) {
-          // If there are existing products, return an empty response
-          return res.json({ message: 'All products are already reported' });
+
+    // Find products that aren't already present in the salesReportCollection
+    const newArtistProducts = artistProducts.filter(product => !existingProducts.some(existingProduct => existingProduct.products.some(p => p.order_id === product.order_id)));
+        console.log(newArtistProducts);
+        if(newArtistProducts.length == 0){
+          return res.json({products: newArtistProducts});
         }
-        
-        // Insert new sales report into the salesReportCollection
-        const insertResult = await salesReportCollection.insertOne({ artistEmail, products: artistProducts, status: 'unpaid', isReportGenerated: false });
-    
-        // Return the inserted sales report along with its _id
-        return res.json({ _id: insertResult.insertedId, artistEmail, products: artistProducts, status: 'unpaid', isReportGenerated: false });
-      } catch (error) {
-        console.error('Error retrieving or updating artist products:', error);
-        res.status(500).json({ error: 'Internal server error' });
-      }
-    });
+    // Insert new sales report into the salesReportCollection
+    const insertResult = await salesReportCollection.insertOne({ artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
 
+    // Return the inserted sales report along with its _id and new products
+    return res.json({ _id: insertResult.insertedId, artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
+  } catch (error) {
+    console.error('Error retrieving or updating artist products:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
-
+            
     app.patch("/sales-report-update/:id", async(req, res) => {
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)};
       const updateDoc = {
         $set: {
-          isReportGenerated: true
+          status: "paid"
         }
       }
       const result = await salesReportCollection.updateOne(filter, updateDoc);
