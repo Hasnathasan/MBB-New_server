@@ -960,6 +960,20 @@ async function run() {
     })
 
 
+    app.patch("/updateArtist/:email", async(req, res) => {
+      const email = req.params.email;
+      const artistUpdatedData = req.body;
+      const filter = {email};
+      const updateDoc = {
+        $set: {
+          ...artistUpdatedData
+        }
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result)
+    })
+
+
     app.post("/orders", async (req, res) => {
       try {
         const order = req.body;
