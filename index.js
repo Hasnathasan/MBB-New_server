@@ -386,6 +386,19 @@ async function run() {
       }
     });
 
+    app.delete("/productDelete/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const result = await productsCollection.deleteOne(filter);
+      res.send(result)
+    })
+    app.delete("/orderDelete/:id", async(req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const result = await ordersCollection.deleteOne(filter);
+      res.send(result)
+    })
+
     app.get("/products", async (req, res) => {
       const { category, priceSlider, minRating, searchQuery, sort, tag } = req.query;
       if(!category && !priceSlider && !minRating && !searchQuery && !sort && !tag) {
@@ -858,19 +871,30 @@ async function run() {
     })
 
     app.patch("/userUpdate/:email", async (req, res) => {
-      const email = req.params.email;
-      const { updatedName, updatedNum, userphoto } = req.body;
-      const filter = { email: email }
-      const updateDoc = {
-        $set: {
-          userName: updatedName,
-          userPhoneNumber: updatedNum,
-          userPhoto: userphoto
+      try {
+        const email = req.params.email;
+        const { updatedName, updatedNum, userphoto } = req.body;
+    
+        const updateDoc = {};
+    
+        if (updatedName) {
+          updateDoc.userName = updatedName;
         }
-      };
-      const result = await usersCollection.updateOne(filter, updateDoc);
-      res.send(result)
-    })
+        if (updatedNum) {
+          updateDoc.userPhoneNumber = updatedNum;
+        }
+        if (userphoto) {
+          updateDoc.userPhoto = userphoto;
+        }
+    
+        const result = await usersCollection.updateOne({ email }, { $set: updateDoc });
+    
+        res.send(result)
+      } catch (error) {
+        console.error("Error updating user data:", error);
+        res.status(500).send("An error occurred while updating user data");
+      }
+    });
     app.patch("/artistUpdate/:email", async (req, res) => {
       const email = req.params.email;
       console.log(email, req.body?.userPhoto);
@@ -1243,6 +1267,14 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+
+
+
+
+
+
+
 
 
 
