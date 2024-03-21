@@ -121,22 +121,22 @@ async function run() {
       }
     });
 
-    app.get("/wish-list-by-email/:email", async(req, res) => {
+    app.get("/wish-list-by-email/:email", async (req, res) => {
       const email = req.params.email;
-      const filter = {addedBy: email};
+      const filter = { addedBy: email };
       const result = await wishListCollection.find(filter).toArray();
       res.send(result)
     })
 
-    app.delete("/deleteWishLish/:id", async(req, res) => {
+    app.delete("/deleteWishLish/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const result = await wishListCollection.deleteOne(filter);
       res.send(result)
     })
 
 
-    app.post("/wish-list", async(req, res) => {
+    app.post("/wish-list", async (req, res) => {
       const wishItem = req.body;
       const result = await wishListCollection.insertOne(wishItem);
       res.send(result)
@@ -386,52 +386,52 @@ async function run() {
       }
     });
 
-    app.delete("/productDelete/:id", async(req, res) => {
+    app.delete("/productDelete/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const result = await productsCollection.deleteOne(filter);
       res.send(result)
     })
-    app.delete("/orderDelete/:id", async(req, res) => {
+    app.delete("/orderDelete/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const result = await ordersCollection.deleteOne(filter);
       res.send(result)
     })
 
     app.get("/products", async (req, res) => {
       const { category, priceSlider, minRating, searchQuery, sort, tag } = req.query;
-      if(!category && !priceSlider && !minRating && !searchQuery && !sort && !tag) {
+      if (!category && !priceSlider && !minRating && !searchQuery && !sort && !tag) {
         const result = await productsCollection.find().toArray();
         res.send(result);
       }
       console.log(category, priceSlider, minRating, searchQuery, sort, tag);
       let sortQuery = {};
-      if(sort == "newest") {
-        sortQuery = {"createdAt": -1};
+      if (sort == "newest") {
+        sortQuery = { "createdAt": -1 };
       }
-      if(sort == "oldest") {
-        sortQuery = {"createdAt": 1};
+      if (sort == "oldest") {
+        sortQuery = { "createdAt": 1 };
       }
       try {
         let matchedProducts;
         let priceQuery = {};
         let ratingQuery = {};
         let tagQuery = {};
-    
+
         const priceSliderArray = priceSlider && priceSlider.length > 0 ? priceSlider.split(",").map(Number) : null;
         console.log(priceSliderArray);
         if (priceSliderArray && priceSliderArray.length === 2) {
           const minPrice = priceSliderArray[0];
           const maxPrice = priceSliderArray[1];
-    
+
           priceQuery = { "price.sale_price": { $gte: minPrice, $lte: maxPrice } };
         }
-    
+
         if (!priceQuery["price.sale_price"]) {
           priceQuery = { "price.regular_price": { $gte: minPrice, $lte: maxPrice } };
         }
-    
+
         if (minRating) {
           ratingQuery = { rating: { $gte: parseInt(minRating.replace("rating", "")) } };
         }
@@ -439,9 +439,9 @@ async function run() {
         if (tag) {
           tagQuery = { product_tags: { $elemMatch: { $regex: new RegExp(tag, 'i') } } };
         }
-    
+
         const searchRegex = new RegExp(searchQuery, 'i');
-    
+
         if (category) {
           if (Object.keys(priceQuery).length !== 0) {
             if (Object.keys(ratingQuery).length !== 0) {
@@ -523,7 +523,7 @@ async function run() {
             }
           }
         }
-    
+
         res.json(matchedProducts);
       } catch (error) {
         console.error('Error searching for products:', error);
@@ -593,7 +593,7 @@ async function run() {
     app.get("/prison/:email", async (req, res) => {
       const email = req.params.email;
 
-      const result = await prisonsCollection.findOne({email});
+      const result = await prisonsCollection.findOne({ email });
       res.send(result)
     })
 
@@ -716,23 +716,23 @@ async function run() {
         console.error('Error fetching orders for the last 12 months:', error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
-    });   
+    });
 
-    app.get("/sales-report-all", async(req, res) =>{
+    app.get("/sales-report-all", async (req, res) => {
       const status = req.query.status;
       console.log(status);
-      let filter={};
-      if(status && status == "all"){
+      let filter = {};
+      if (status && status == "all") {
         filter = {}
       }
-      else if(status){
-        filter = {status}
+      else if (status) {
+        filter = { status }
       }
-      const result= await salesReportCollection.find(filter).toArray();
-      res.send(result) 
+      const result = await salesReportCollection.find(filter).toArray();
+      res.send(result)
     })
 
- 
+
     app.get('/popularTags', async (req, res) => {
       try {
         const popularTagsCursor = await productsCollection.aggregate([
@@ -741,20 +741,20 @@ async function run() {
           { $sort: { count: -1 } },
           { $project: { _id: 1 } } // Project only the _id field
         ]);
-    
+
         // Convert the cursor to an array of documents
         const popularTags = await popularTagsCursor.limit(10).toArray();
-    
+
         // Extract tag names from the array of documents
         const tagNames = popularTags.map(tag => tag._id);
-    
+
         res.json(tagNames);
       } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
       }
     });
- 
+
 
     app.get("/popularCategories", async (req, res) => {
       try {
@@ -874,9 +874,9 @@ async function run() {
       try {
         const email = req.params.email;
         const { updatedName, updatedNum, userphoto } = req.body;
-    
+
         const updateDoc = {};
-    
+
         if (updatedName) {
           updateDoc.userName = updatedName;
         }
@@ -886,9 +886,9 @@ async function run() {
         if (userphoto) {
           updateDoc.userPhoto = userphoto;
         }
-    
+
         const result = await usersCollection.updateOne({ email }, { $set: updateDoc });
-    
+
         res.send(result)
       } catch (error) {
         console.error("Error updating user data:", error);
@@ -1028,10 +1028,10 @@ async function run() {
     })
 
 
-    app.patch("/updateProducts/:id", async(req, res) => {
+    app.patch("/updateProducts/:id", async (req, res) => {
       const updatedProductData = req.body;
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
           ...updatedProductData
@@ -1042,10 +1042,10 @@ async function run() {
     })
 
 
-    app.patch("/updateArtist/:email", async(req, res) => {
+    app.patch("/updateArtist/:email", async (req, res) => {
       const email = req.params.email;
       const artistUpdatedData = req.body;
-      const filter = {email};
+      const filter = { email };
       const updateDoc = {
         $set: {
           ...artistUpdatedData
@@ -1140,21 +1140,21 @@ async function run() {
       if (!artistEmail) {
         return res.status(500).json({ error: 'Artist email not provided' });
       }
-      
+
       try {
         // Check if there are any unreported sales reports for the artist
         const existingReports = await salesReportCollection.find({ artistEmail, isReportGenerated: false }).toArray();
-    // console.log(existingReports);
+        // console.log(existingReports);
         if (existingReports.length > 0) {
           // If there are unreported sales reports, return the first one found
           return res.json({ _id: existingReports[0]._id, artistEmail, products: existingReports[0].products, status: existingProducts[0].status, isReportGenerated: false });
         }
-        
+
         // Collect products from ordersCollection for the specified artistEmail
         const orders = await ordersCollection.find({ 'products.artist_details.artist': artistEmail }).toArray();
         // console.log(orders);
-        if(orders.length == 0){
-          return res.json({products: orders});
+        if (orders.length == 0) {
+          return res.json({ products: orders });
         }
         // Extract products sold by the artist from the orders and add order_id to each product
         const artistProducts = orders.reduce((acc, order) => {
@@ -1165,27 +1165,27 @@ async function run() {
         // Check for existing products in the salesReportCollection
         const existingProducts = await salesReportCollection.find({ 'products.order_id': { $in: artistProducts.map(p => p.order_id) } }).toArray();
 
-    // Find products that aren't already present in the salesReportCollection
-    const newArtistProducts = artistProducts.filter(product => !existingProducts.some(existingProduct => existingProduct.products.some(p => p.order_id === product.order_id)));
+        // Find products that aren't already present in the salesReportCollection
+        const newArtistProducts = artistProducts.filter(product => !existingProducts.some(existingProduct => existingProduct.products.some(p => p.order_id === product.order_id)));
         console.log(newArtistProducts);
-        if(newArtistProducts.length == 0){
-          return res.json({products: newArtistProducts});
+        if (newArtistProducts.length == 0) {
+          return res.json({ products: newArtistProducts });
         }
-    // Insert new sales report into the salesReportCollection
-    const insertResult = await salesReportCollection.insertOne({ artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
+        // Insert new sales report into the salesReportCollection
+        const insertResult = await salesReportCollection.insertOne({ artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
 
-    // Return the inserted sales report along with its _id and new products
-    return res.json({ _id: insertResult.insertedId, artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
-  } catch (error) {
-    console.error('Error retrieving or updating artist products:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+        // Return the inserted sales report along with its _id and new products
+        return res.json({ _id: insertResult.insertedId, artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
+      } catch (error) {
+        console.error('Error retrieving or updating artist products:', error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    });
 
-            
-    app.patch("/sales-report-update/:id", async(req, res) => {
+
+    app.patch("/sales-report-update/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)};
+      const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
           status: "paid"
