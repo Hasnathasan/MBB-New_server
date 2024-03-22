@@ -404,6 +404,18 @@ async function run() {
       const result = await prisonsCollection.deleteOne(filter);
       res.send(result)
     })
+    app.delete("/customerDelete/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { email };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result)
+    })
+    app.delete("/artistDelete/:email", async (req, res) => {
+      const email = req.params.email;
+      const filter = { email };
+      const result = await usersCollection.deleteOne(filter);
+      res.send(result)
+    })
 
     app.get("/products", async (req, res) => {
       const { category, priceSlider, minRating, searchQuery, sort, tag } = req.query;
