@@ -895,6 +895,45 @@ async function run() {
         res.status(500).send("An error occurred while updating user data");
       }
     });
+    app.patch("/prisonUpdate/:email", async (req, res) => {
+      try {
+        const email = req.params.email;
+        const { prison_name,
+          country,
+          states,
+          address,
+          zipCode,
+          number, } = req.body;
+
+        const updateDoc = {};
+
+        if (prison_name) {
+          updateDoc.prison_name = prison_name;
+        }
+        if (country) {
+          updateDoc.country = country;
+        }
+        if (states) {
+          updateDoc.states = states;
+        }
+        if (address) {
+          updateDoc.address = address;
+        }
+        if (zipCode) {
+          updateDoc.zipCode = zipCode;
+        }
+        if (number) {
+          updateDoc.number = number;
+        }
+
+        const result = await prisonsCollection.updateOne({ email }, { $set: updateDoc });
+
+        res.send(result)
+      } catch (error) {
+        console.error("Error updating user data:", error);
+        res.status(500).send("An error occurred while updating user data");
+      }
+    });
     app.patch("/artistUpdate/:email", async (req, res) => {
       const email = req.params.email;
       console.log(email, req.body?.userPhoto);
