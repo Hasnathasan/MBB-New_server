@@ -1243,6 +1243,29 @@ async function run() {
       }
     });
 
+    app.get('/isPurchased', async (req, res) => {
+      const { email, productId } = req.query;
+  
+      try {
+  
+          // Search for orders matching the email and containing the product ID
+          const order = await ordersCollection.findOne({
+              'userDetails.email': email,
+              'products.product_id': productId
+          });
+  
+          if (order) {
+              res.json({ available: true });
+          } else {
+              res.json({ available: false });
+          }
+      } catch (err) {
+          console.error('Error checking product availability:', err);
+          res.status(500).json({ error: 'Internal server error' });
+      }
+  });
+  
+
 
     app.patch("/sales-report-update/:id", async (req, res) => {
       const id = req.params.id;
