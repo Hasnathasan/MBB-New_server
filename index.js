@@ -1208,8 +1208,12 @@ async function run() {
         }
 
         // Collect products from ordersCollection for the specified artistEmail
-        const orders = await ordersCollection.find({ 'products.artist_details.artist': artistEmail }).toArray();
+        const orders = await ordersCollection.find({
+          'products.artist_details.artist': artistEmail,
+          'status': 'delivered'
+        }).toArray();
         // console.log(orders);
+        console.log(orders);
         if (orders.length == 0) {
           return res.json({ products: orders });
         }
