@@ -1032,7 +1032,7 @@ async function run() {
 
           // Calculate total rating from all reviews
           reviews.forEach(review => {
-            totalRating += review.rating;
+            totalRating += review.rating || 0;
           });
 
           // Calculate the average rating
@@ -1245,26 +1245,26 @@ async function run() {
 
     app.get('/isPurchased', async (req, res) => {
       const { email, productId } = req.query;
-  
+
       try {
-  
-          // Search for orders matching the email and containing the product ID
-          const order = await ordersCollection.findOne({
-              'userDetails.email': email,
-              'products.product_id': productId
-          });
-  
-          if (order) {
-              res.json({ available: true });
-          } else {
-              res.json({ available: false });
-          }
+
+        // Search for orders matching the email and containing the product ID
+        const order = await ordersCollection.findOne({
+          'userDetails.email': email,
+          'products.product_id': productId
+        });
+
+        if (order) {
+          res.json({ available: true });
+        } else {
+          res.json({ available: false });
+        }
       } catch (err) {
-          console.error('Error checking product availability:', err);
-          res.status(500).json({ error: 'Internal server error' });
+        console.error('Error checking product availability:', err);
+        res.status(500).json({ error: 'Internal server error' });
       }
-  });
-  
+    });
+
 
 
     app.patch("/sales-report-update/:id", async (req, res) => {
@@ -1351,7 +1351,6 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
 
 
 
