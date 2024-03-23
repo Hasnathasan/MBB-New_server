@@ -84,6 +84,7 @@ async function run() {
     const ordersCollection = db.collection("orders");
     const categoryCollection = db.collection("categories");
     const salesReportCollection = db.collection('sales-report');
+    const bannerImageCollection = db.collection('bannar-images');
 
 
 
@@ -120,6 +121,24 @@ async function run() {
         res.status(500).send('Internal server error');
       }
     });
+
+    app.patch('/banner-image-delete', async (req, res) => {
+      try {
+        const {img} = req.body;
+    
+        if (!img) {
+          return res.status(400).json({ message: 'Image URL is required' });
+        }
+    
+        const result = await bannerImageCollection.updateOne({}, { $pull: { images: img } });
+    
+        res.send(result)
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    });
+    
 
     app.get("/wish-list-by-email/:email", async (req, res) => {
       const email = req.params.email;
@@ -1242,6 +1261,11 @@ async function run() {
         res.status(500).json({ error: 'Internal server error' });
       }
     });
+
+    app.get("/bannerImages", async(req, res) => {
+      const result = await bannerImageCollection.find().toArray();
+      res.send(result)
+    })
 
     app.get('/isPurchased', async (req, res) => {
       const { email, productId } = req.query;
