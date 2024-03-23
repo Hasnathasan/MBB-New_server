@@ -138,6 +138,25 @@ async function run() {
         res.status(500).json({ message: 'Internal server error' });
       }
     });
+
+    app.post('/bannerImage', async (req, res) => {
+      try {
+        const {newImages} = req.body;
+    
+        if (!Array.isArray(newImages)) {
+          return res.status(400).json({ message: 'Images should be an array' });
+        }
+    
+    
+        // Update the document and add the new images to the existing images array
+        const result = await bannerImageCollection.updateOne({}, { $push: { images: { $each: newImages } } });
+    
+        res.send(result)
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+    });
     
 
     app.get("/wish-list-by-email/:email", async (req, res) => {
@@ -168,7 +187,11 @@ async function run() {
           return res.status(400).json({ message: 'No files were uploaded.' });
         }
 
-        const images = req.files.files;
+        let images = req.files.files;
+    if (!Array.isArray(images)) {
+      images = [images];
+    }
+        
         const uploadPromises = images.map(async (image) => {
           const imageStream = new Readable();
           imageStream.push(image.data);
