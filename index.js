@@ -85,6 +85,7 @@ async function run() {
     const categoryCollection = db.collection("categories");
     const salesReportCollection = db.collection('sales-report');
     const bannerImageCollection = db.collection('bannar-images');
+    const SystemSettingCollection = db.collection('system-settings');
 
 
 
@@ -178,6 +179,27 @@ async function run() {
       const wishItem = req.body;
       const result = await wishListCollection.insertOne(wishItem);
       res.send(result)
+    })
+
+
+    app.patch("/system-setting", async(req, res) => {
+      const {system_name, email, phone_number, logo} = req.body;
+      const filter = {_id: new ObjectId("65ffc791517ac4c2a1fc91de")}
+      const updateDoc = {};
+        if (system_name) {
+          updateDoc.$set.system_name = system_name;
+        }
+        if (email) {
+          updateDoc.$set.email = email;
+        }
+        if (phone_number) {
+          updateDoc.$set.phone_number = phone_number;
+        }
+        if (logo) {
+          updateDoc.$set.logo = logo;
+        }
+        const result = await SystemSettingCollection.updateOne(filter, updateDoc);
+        res.send(result)
     })
 
 
