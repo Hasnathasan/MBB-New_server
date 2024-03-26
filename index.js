@@ -125,14 +125,14 @@ async function run() {
 
     app.patch('/banner-image-delete', async (req, res) => {
       try {
-        const {img} = req.body;
-    
+        const { img } = req.body;
+
         if (!img) {
           return res.status(400).json({ message: 'Image URL is required' });
         }
-    
+
         const result = await bannerImageCollection.updateOne({}, { $pull: { images: img } });
-    
+
         res.send(result)
       } catch (error) {
         console.error(error);
@@ -142,23 +142,23 @@ async function run() {
 
     app.post('/bannerImage', async (req, res) => {
       try {
-        const {newImages} = req.body;
-    
+        const { newImages } = req.body;
+
         if (!Array.isArray(newImages)) {
           return res.status(400).json({ message: 'Images should be an array' });
         }
-    
-    
+
+
         // Update the document and add the new images to the existing images array
         const result = await bannerImageCollection.updateOne({}, { $push: { images: { $each: newImages } } });
-    
+
         res.send(result)
       } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
       }
     });
-    
+
 
     app.get("/wish-list-by-email/:email", async (req, res) => {
       const email = req.params.email;
@@ -182,24 +182,24 @@ async function run() {
     })
 
 
-    app.patch("/system-setting", async(req, res) => {
-      const {system_name, email, phone_number, logo} = req.body;
-      const filter = {_id: new ObjectId("65ffc791517ac4c2a1fc91de")}
+    app.patch("/system-setting", async (req, res) => {
+      const { system_name, email, phone_number, logo } = req.body;
+      const filter = { _id: new ObjectId("65ffc791517ac4c2a1fc91de") }
       const updateDoc = {};
-        if (system_name) {
-          updateDoc.$set.system_name = system_name;
-        }
-        if (email) {
-          updateDoc.$set.email = email;
-        }
-        if (phone_number) {
-          updateDoc.$set.phone_number = phone_number;
-        }
-        if (logo) {
-          updateDoc.$set.logo = logo;
-        }
-        const result = await SystemSettingCollection.updateOne(filter, updateDoc);
-        res.send(result)
+      if (system_name) {
+        updateDoc.$set.system_name = system_name;
+      }
+      if (email) {
+        updateDoc.$set.email = email;
+      }
+      if (phone_number) {
+        updateDoc.$set.phone_number = phone_number;
+      }
+      if (logo) {
+        updateDoc.$set.logo = logo;
+      }
+      const result = await SystemSettingCollection.updateOne(filter, updateDoc);
+      res.send(result)
     })
 
 
@@ -210,10 +210,10 @@ async function run() {
         }
 
         let images = req.files.files;
-    if (!Array.isArray(images)) {
-      images = [images];
-    }
-        
+        if (!Array.isArray(images)) {
+          images = [images];
+        }
+
         const uploadPromises = images.map(async (image) => {
           const imageStream = new Readable();
           imageStream.push(image.data);
@@ -1307,7 +1307,7 @@ async function run() {
       }
     });
 
-    app.get("/bannerImages", async(req, res) => {
+    app.get("/bannerImages", async (req, res) => {
       const result = await bannerImageCollection.find().toArray();
       res.send(result)
     })
