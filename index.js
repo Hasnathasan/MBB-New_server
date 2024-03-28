@@ -239,8 +239,6 @@ async function run() {
 
 
 
-
-
     app.post('/jwt', (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.JWT_ACCESS_TOKEN, { expiresIn: '10h' });
@@ -1177,6 +1175,8 @@ async function run() {
     })
 
 
+
+    
     app.post("/orders", async (req, res) => {
       try {
         const order = req.body;
@@ -1254,6 +1254,8 @@ async function run() {
       const result = await ordersCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
+
+
 
 
     app.get('/sales-report', async (req, res) => {
@@ -1348,6 +1350,8 @@ async function run() {
       res.send(result)
     })
 
+
+
     app.get('/artist-sales/:artistEmail', async (req, res) => {
       try {
         const artistEmail = req.params.artistEmail;
@@ -1420,29 +1424,5 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
