@@ -123,15 +123,12 @@ async function run() {
       }
     });
 
-    app.patch('/banner-image-delete', async (req, res) => {
+    app.delete('/banner-image-delete/:id', async (req, res) => {
       try {
-        const { img } = req.body;
+        const id = req.params.id
 
-        if (!img) {
-          return res.status(400).json({ message: 'Image URL is required' });
-        }
-
-        const result = await bannerImageCollection.updateOne({}, { $pull: { images: img } });
+        const filter = {_id: new ObjectId(id)};
+        const result = await bannerImageCollection.deleteOne(filter);
 
         res.send(result)
       } catch (error) {
@@ -1313,6 +1310,12 @@ async function run() {
       const result = await bannerImageCollection.find().toArray();
       res.send(result)
     })
+
+    app.post("/bannerImages", async(req, res) => {
+      const banner = req.body;
+      const result = await bannerImageCollection.insertOne(banner);
+      res.send(result)
+        })
 
     app.get('/isPurchased', async (req, res) => {
       const { email, productId } = req.query;
