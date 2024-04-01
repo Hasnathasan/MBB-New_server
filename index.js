@@ -179,10 +179,20 @@ async function run() {
     })
 
 
-    app.patch("/system-setting", async (req, res) => {
+    app.get("/system-setting", async(req, res) => {
+      const result = await SystemSettingCollection.find().toArray();
+      res.send(result)
+    })
+
+
+    app.patch("/system-setting-update/:id", async (req, res) => {
+      const id = req.params.id;
       const { system_name, email, phone_number, logo } = req.body;
-      const filter = { _id: new ObjectId("65ffc791517ac4c2a1fc91de") }
-      const updateDoc = {};
+      console.log(req.body);
+      const filter = { _id: new ObjectId(id) }
+      let updateDoc = {
+        $set: {}
+      };
       if (system_name) {
         updateDoc.$set.system_name = system_name;
       }
