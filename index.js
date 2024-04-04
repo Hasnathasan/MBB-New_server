@@ -10,8 +10,8 @@ var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d
 
 const transporter = nodemailer.createTransport(mailgunTransport({
   auth: {
-    api_key: '46416385868c79f519dbc1b0c32d0487-4c205c86-f157dc88', // Your Mailgun API key
-    domain: 'www.mbb-e-commerce.com'    // Your Mailgun domain
+    api_key: process.env.MAILGUN_API_KEY, // Your Mailgun API key
+    domain: process.env.MAILGUN_DOMAIN    // Your Mailgun domain
   }
 }));
 
