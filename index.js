@@ -1,11 +1,19 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
+const nodemailer = require('nodemailer');
 const cors = require("cors");
 // var jwt = require('jsonwebtoken');
 var admin = require("firebase-admin");
 const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'arannachowdhury193@gmail.com',
+    pass: 'iTsAranna71.cOm'
+  }
+});
 
 
 const fileUpload = require('express-fileupload');
@@ -1235,6 +1243,40 @@ async function run() {
           status
         }
       };
+      if(status == "delivered"){
+        const mailOptions = {
+          from: 'arannachowdhury193@gmail.com',
+          to: "hasnatoooooooo@gmail.com",
+          subject: 'Your Order from MBB Has Been Delivered!',
+          html: `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Your Order Delivered</title>
+          </head>
+          <body>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2>Your Order from MBB Has Been Delivered!</h2>
+              <p>Dear Customer,</p>
+              <p>We are pleased to inform you that your order has been successfully delivered.</p>
+              <p>Thank you for shopping with us!</p>
+              <p>Sincerely,</p>
+              <p>Your Store</p>
+            </div>
+          </body>
+          </html>
+        `
+        };
+      
+        try {
+          const info = await transporter.sendMail(mailOptions);
+          console.log(`Email sent: ${info.response}`);
+        } catch (error) {
+          console.error('Error sending email:', error);
+        }
+      }
       const result = ordersCollection.updateOne(filter, updateDoc);
       res.send(result)
     })
@@ -1439,5 +1481,10 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+
+
+
+
 
 
