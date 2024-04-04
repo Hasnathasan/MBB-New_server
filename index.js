@@ -1,19 +1,19 @@
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const nodemailer = require('nodemailer');
+const mailgunTransport = require('nodemailer-mailgun-transport');
 const cors = require("cors");
 // var jwt = require('jsonwebtoken');
 var admin = require("firebase-admin");
 const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
+const transporter = nodemailer.createTransport(mailgunTransport({
   auth: {
-    user: 'arannachowdhury193@gmail.com',
-    pass: 'iTsAranna71.cOm'
+    api_key: '46416385868c79f519dbc1b0c32d0487-4c205c86-f157dc88', // Your Mailgun API key
+    domain: 'www.mbb-e-commerce.com'    // Your Mailgun domain
   }
-});
+}));
 
 
 const fileUpload = require('express-fileupload');
