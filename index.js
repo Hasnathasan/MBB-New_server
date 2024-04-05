@@ -8,12 +8,21 @@ var admin = require("firebase-admin");
 const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 
-const transporter = nodemailer.createTransport(mailgunTransport({
+// const transporter = nodemailer.createTransport(mailgunTransport({
+//   auth: {
+//     api_key: process.env.MAILGUN_API_KEY, // Your Mailgun API key
+//     domain: process.env.MAILGUN_DOMAIN    // Your Mailgun domain
+//   }
+// }));
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
   auth: {
-    api_key: process.env.MAILGUN_API_KEY, // Your Mailgun API key
-    domain: process.env.MAILGUN_DOMAIN    // Your Mailgun domain
+      user: 'hasnatoooooooo@gmail.com',
+      pass: process.env.GOOGLE_APP_PASS
   }
-}));
+});
+console.log(process.env.DB_USER);
 
 
 const fileUpload = require('express-fileupload');
@@ -70,14 +79,14 @@ app.get('/', (req, res) => {
 })
 
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uf4d7tl.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uf4d7tl.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
-    version: ServerApiVersion.v1,
+    version: ServerApiVersion.v1, 
     strict: true,
     deprecationErrors: true,
-  }
+  } 
 });
 async function run() {
   try {
@@ -1238,6 +1247,7 @@ async function run() {
       const status = req.query.status;
       console.log(id, status);
       const filter = { _id: new ObjectId(id) };
+      const order = await ordersCollection.findOne(filter);
       const updateDoc = {
         $set: {
           status
@@ -1248,26 +1258,125 @@ async function run() {
           from: 'arannachowdhury193@gmail.com',
           to: "hasnatoooooooo@gmail.com",
           subject: 'Your Order from MBB Has Been Delivered!',
-          html: `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Your Order Delivered</title>
-          </head>
-          <body>
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2>Your Order from MBB Has Been Delivered!</h2>
-              <p>Dear Customer,</p>
-              <p>We are pleased to inform you that your order has been successfully delivered.</p>
-              <p>Thank you for shopping with us!</p>
-              <p>Sincerely,</p>
-              <p>Your Store</p>
-            </div>
-          </body>
-          </html>
-        `
+//           html: `
+//           <!DOCTYPE html>
+// <html lang="en">
+// <head>
+// <meta charset="UTF-8">
+// <meta name="viewport" content="width=device-width, initial-scale=1.0">
+// <title>Order Details PDF</title>
+// <style>
+//     body {
+//         font-family: Arial, sans-serif;
+//         margin: 0;
+//         padding: 0;
+//     }
+//     .container {
+//         margin: 20px;
+//         padding: 20px;
+//         width: 100%;
+//         box-sizing: border-box;
+//     }
+//     .title {
+//         font-size: 20px;
+//         font-weight: bold;
+//         margin-bottom: 10px;
+//     }
+//     .subtitle {
+//         font-size: 16px;
+//         margin-bottom: 10px;
+//     }
+//     .text {
+//         font-size: 12px;
+//         margin-bottom: 5px;
+//     }
+//     .row {
+//         display: flex;
+//         justify-content: space-between;
+//         margin-bottom: 30px;
+//     }
+//     .label {
+//         font-weight: bold;
+//         margin-right: 5px;
+//     }
+//     .tableContainer {
+//         width: 100%;
+//     }
+//     .tableHeader {
+//         display: flex;
+//         background-color: #f0f0f0;
+//         padding: 4px;
+//         border-bottom: 1px solid #ccc;
+//     }
+//     .tableRow {
+//         display: flex;
+//         padding: 4px;
+//         border-bottom: 1px solid #ccc;
+//     }
+//     .tableCell {
+//         flex: 1;
+//         padding: 4px;
+//         font-size: 10px;
+//     }
+// </style>
+// </head>
+// <body>
+// <div class="container" id="pdfContent">
+// <img src="../../../../assets/logo.png" alt="Logo" style="width: 150px; height: 60px; margin-bottom: 35px;">
+// <div class="row">
+//     <div class="title">Order Details</div>
+//     <div class="text">Date: ${order.createdAt}</div>
+//     <div class="text">Total ${order.products.length} Products</div>
+// </div>
+// <div class="tableContainer">
+//     <div class="row">
+//         <div>
+//             <div class="subtitle">Billing Address</div>
+//             <div class="text">Name: ${order.userDetails.userName}</div>
+//             <div class="text">Address: ${order.userDetails.address}</div>
+//             <div class="text">Email: ${order.userDetails.email}</div>
+//             <div class="text">Phone: ${order.userDetails.userPhoneNumber}</div>
+//         </div>
+//         <div>
+//             <div class="subtitle">Shipping Address</div>
+//             <div class="text">Name: ${order.shipping_address.userName}</div>
+//             <div class="text">Address: ${order.shipping_address.address}</div>
+//             <div class="text">Email: ${order.shipping_address.email}</div>
+//             <div class="text">Phone: ${order.shipping_address.userPhoneNumber}</div>
+//         </div>
+//     </div>
+//     <div class="row">
+//         <div>
+//             <div class="subtitle">Transaction Details</div>
+//             <div class="text">Transaction ID: <span style="color: green;">${order.transactionId}</span></div>
+//             <div class="text">Payment Method: <span style="color: #333;">STRIPE</span></div>
+//         </div>
+//         <div>
+//             <div class="subtitle">Order Total</div>
+//             <div class="text">Subtotal: $${order.total_price}</div>
+//         </div>
+//     </div>
+//     <div class="tableHeader">
+//         <div class="tableCell">PRODUCT</div>
+//         <div class="tableCell">PRICE</div>
+//         <div class="tableCell">QUANTITY</div>
+//         <div class="tableCell">SUBTOTAL</div>
+//     </div>
+//     ${order.products.map(product => `
+//         <div class="tableRow">
+//             <div class="tableCell">${product.product_name}</div>
+//             <div class="tableCell">$${product?.price?.sale_price || product?.price?.regular_price}</div>
+//             <div class="tableCell">x${product.quantity}</div>
+//             <div class="tableCell">$${(product?.price?.sale_price || product?.price?.regular_price) * product?.quantity}</div>
+//         </div>
+//     `).join('')}
+// </div>
+// </div>
+
+
+// </body>
+// </html>
+//         `
         };
       
         try {
