@@ -15,6 +15,7 @@ var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d
 //   }
 // }));
 
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -27,7 +28,6 @@ console.log(process.env.DB_USER);
 
 const fileUpload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
-const fs = require('fs');
 const { Readable } = require('stream');
 require('dotenv').config()
 const app = express();
@@ -1420,50 +1420,6 @@ const slicedDate = dateString.slice(0, 10);
               <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color: #e7e7e7;"><![endif]-->
               
             
-            
-          <div class="u-row-container" style="padding: 0px;background-color: transparent">
-            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #2cb4f3;">
-              <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
-                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #2cb4f3;"><![endif]-->
-                
-          <!--[if (mso)|(IE)]><td align="center" width="600" style="width: 600px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
-          <div class="u-col u-col-100" style="max-width: 320px;min-width: 600px;display: table-cell;vertical-align: top;">
-            <div style="height: 100%;width: 100% !important;">
-            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
-            
-          <table style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-            <tbody>
-              <tr>
-                <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:20px 10px;font-family:'Montserrat',sans-serif;" align="left">
-                  
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td class="v-text-align" style="padding-right: 0px;padding-left: 0px;" align="center">
-                
-                <img align="center" border="0" src="./public/Images/logo.png" alt="Logo" title="Logo" style="outline: none;text-decoration: none;-ms-interpolation-mode: bicubic;clear: both;display: inline-block !important;border: none;height: auto;float: none;width: 100%;max-width: 178px;" width="178"/>
-                
-              </td>
-            </tr>
-          </table>
-          
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
-            </div>
-          </div>
-          <!--[if (mso)|(IE)]></td><![endif]-->
-                <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
-              </div>
-            </div>
-            </div>
-            
-          
-          
-            
-            
           <div class="u-row-container" style="padding: 0px;background-color: transparent">
             <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: transparent;">
               <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
@@ -1480,7 +1436,7 @@ const slicedDate = dateString.slice(0, 10);
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
           
-              <h1 class="v-text-align" style="margin: 0px; line-height: 140%; text-align: center; word-wrap: break-word; font-size: 22px; font-weight: 400;"><span><span>Your Order has been delivered</span></span></h1>
+              <h1 class="v-text-align" style="margin: 0px; line-height: 140%; padding: 30px 0 30px 0; text-align: center; word-wrap: break-word; font-size: 22px; font-weight: 400;"><span><span>Your Order has been delivered</span></span></h1>
           
           
                 </td>
@@ -1571,7 +1527,7 @@ const slicedDate = dateString.slice(0, 10);
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 5px 15px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;">${order?.transactionId}</span></p>
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 12px; color:"#00a006"; line-height: 22.4px;">${order?.transactionId}</span></p>
             </div>
           
                 </td>
@@ -1585,7 +1541,7 @@ const slicedDate = dateString.slice(0, 10);
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 5px 15px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; color: #b2b0b0; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><strong><span style="font-size: 16px; line-height: 22.4px;">Date Of Issue</span></strong></p>
+              <p style="font-size: 14px; line-height: 140%;"><strong><span style="font-size: 16px; line-height: 22.4px;">Date Of Issue: <span style="font-size: 12px; color: #000000;">${slicedDate}</span></span></strong></p>
             </div>
           
                 </td>
@@ -1593,19 +1549,7 @@ const slicedDate = dateString.slice(0, 10);
             </tbody>
           </table>
           
-          <table id="u_content_text_16" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-            <tbody>
-              <tr>
-                <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 5px 15px;font-family:'Montserrat',sans-serif;" align="left">
-                  
-            <div class="v-text-align" style="font-size: 14px; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;">${slicedDate}</span></p>
-            </div>
           
-                </td>
-              </tr>
-            </tbody>
-          </table>
           
             <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
             </div>
@@ -1716,7 +1660,7 @@ const slicedDate = dateString.slice(0, 10);
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 10px 15px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Description </strong></span></p>
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Product Name </strong></span></p>
             </div>
           
                 </td>
@@ -1739,7 +1683,7 @@ const slicedDate = dateString.slice(0, 10);
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Unit Cost </strong></span></p>
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Price </strong></span></p>
             </div>
           
                 </td>
@@ -1762,7 +1706,7 @@ const slicedDate = dateString.slice(0, 10);
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Qty / Hr Rate </strong></span></p>
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Qty </strong></span></p>
             </div>
           
                 </td>
@@ -1861,7 +1805,7 @@ const slicedDate = dateString.slice(0, 10);
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 5px 15px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><strong>${product?.product_name}</strong></p>
+              <p style="font-size: 14px; line-height: 140%; text-transform: capitalize;"><strong>${product?.product_name}</strong></p>
             </div>
           
                 </td>
