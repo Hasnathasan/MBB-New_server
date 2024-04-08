@@ -19,8 +19,8 @@ var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-      user: 'hasnatoooooooo@gmail.com',
-      pass: 'buiy ogak zilt shzu'
+    user: 'hasnatoooooooo@gmail.com',
+    pass: 'buiy ogak zilt shzu'
   }
 });
 console.log(process.env.DB_USER);
@@ -83,10 +83,10 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
-    version: ServerApiVersion.v1, 
+    version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  } 
+  }
 });
 async function run() {
   try {
@@ -144,7 +144,7 @@ async function run() {
       try {
         const id = req.params.id
 
-        const filter = {_id: new ObjectId(id)};
+        const filter = { _id: new ObjectId(id) };
         const result = await bannerImageCollection.deleteOne(filter);
 
         res.send(result)
@@ -196,7 +196,7 @@ async function run() {
     })
 
 
-    app.get("/system-setting", async(req, res) => {
+    app.get("/system-setting", async (req, res) => {
       const result = await SystemSettingCollection.find().toArray();
       res.send(result)
     })
@@ -859,7 +859,7 @@ async function run() {
       }
     });
 
-  
+
 
 
     app.get("/popularCategories", async (req, res) => {
@@ -1202,7 +1202,7 @@ async function run() {
 
 
 
-    
+
     app.post("/orders", async (req, res) => {
       try {
         const order = req.body;
@@ -1249,22 +1249,22 @@ async function run() {
       const filter = { _id: new ObjectId(id) };
       const order = await ordersCollection.findOne(filter);
       const today = new Date();
+      const website = await SystemSettingCollection.find().toArray();
+      // Convert the date to a string
+      const dateString = today.toISOString();
 
-// Convert the date to a string
-const dateString = today.toISOString();
-
-// Extract the substring from index 1 to 10
-const slicedDate = dateString.slice(0, 10);
+      // Extract the substring from index 1 to 10
+      const slicedDate = dateString.slice(0, 10);
       const updateDoc = {
         $set: {
           status
         }
       };
-      if(status == "delivered"){
+      if (status == "delivered") {
         const mailOptions = {
-          from: 'arannachowdhury193@gmail.com',
-          to: "hasnatoooooooo@gmail.com",
-          subject: 'Your Order from MBB Has Been Delivered!',
+          from: website[0]?.email,
+          to: order?.shipping_address?.email || order?.userDetails?.email,
+          subject: `Your Order from ${website[0]?.system_name || "MBB"} Has Been Delivered!`,
           html: `
           <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
           <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -1788,8 +1788,7 @@ const slicedDate = dateString.slice(0, 10);
             </div>
             
           
-          ${
-            order?.products?.map(product => `<div class="u-row-container" style="padding: 0px;background-color: transparent">
+          ${order?.products?.map(product => `<div class="u-row-container" style="padding: 0px;background-color: transparent">
             <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
               <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
                 <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #ffffff;"><![endif]-->
@@ -1889,58 +1888,54 @@ const slicedDate = dateString.slice(0, 10);
                 <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
               </div>
             </div>
-            </div>`)
-          }
-            
-            
-          
-            
-          
-          
-            
-            
-          <div class="u-row-container" style="padding: 0px;background-color: transparent">
-            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
-              <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
-                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #ffffff;"><![endif]-->
-                
-          <!--[if (mso)|(IE)]><td align="center" width="600" style="width: 600px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
-          <div class="u-col u-col-100" style="max-width: 320px;min-width: 600px;display: table-cell;vertical-align: top;">
-            <div style="height: 100%;width: 100% !important;">
-            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
-            
-          <table id="u_content_divider_13" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-            <tbody>
-              <tr>
-                <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:5px 10px 10px;font-family:'Montserrat',sans-serif;" align="left">
-                  
-            <table height="0px" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;border-top: 1px solid #BBBBBB;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
-              <tbody>
-                <tr style="vertical-align: top">
-                  <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top;font-size: 0px;line-height: 0px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
-                    <span>&#160;</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
-            </div>
-          </div>
-          <!--[if (mso)|(IE)]></td><![endif]-->
-                <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
-              </div>
-            </div>
             </div>
             
-          
+            <div class="u-row-container" style="padding: 0px;background-color: transparent">
+  <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
+    <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
+      <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #ffffff;"><![endif]-->
+      
+<!--[if (mso)|(IE)]><td align="center" width="600" style="width: 600px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
+<div class="u-col u-col-100" style="max-width: 320px;min-width: 600px;display: table-cell;vertical-align: top;">
+  <div style="height: 100%;width: 100% !important;">
+  <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
+  
+<table style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+  <tbody>
+    <tr>
+      <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:5px 10px;font-family:'Montserrat',sans-serif;" align="left">
+        
+  <table height="0px" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;border-top: 1px solid #BBBBBB;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+    <tbody>
+      <tr style="vertical-align: top">
+        <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top;font-size: 0px;line-height: 0px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+          <span>&#160;</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+  <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+  </div>
+</div>
+<!--[if (mso)|(IE)]></td><![endif]-->
+      <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+    </div>
+  </div>
+  </div>
+            
+            `)
+            }
+            
+            
           
             
+          
             
           <div class="u-row-container" style="padding: 0px;background-color: transparent">
             <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
@@ -2439,11 +2434,11 @@ const slicedDate = dateString.slice(0, 10);
       res.send(result)
     })
 
-    app.post("/bannerImages", async(req, res) => {
+    app.post("/bannerImages", async (req, res) => {
       const banner = req.body;
       const result = await bannerImageCollection.insertOne(banner);
       res.send(result)
-        })
+    })
 
     app.get('/isPurchased', async (req, res) => {
       const { email, productId } = req.query;
