@@ -678,8 +678,10 @@ async function run() {
     });
 
     app.post("/prisons", async (req, res) => {
-      const prison = req.body;
+      let prison = req.body;
       const email = prison?.email;
+      const createdAt = new Date();
+      prison.createdAt = createdAt;
       const filter = { email };
       const isPrisonAvailable = await prisonsCollection.findOne(filter);
       if (isPrisonAvailable) {
@@ -691,7 +693,8 @@ async function run() {
       }
     })
     app.get("/prisons", async (req, res) => {
-      const result = await prisonsCollection.find().toArray();
+      let sortCriteria = { createdAt: -1 };
+      const result = await prisonsCollection.find().sort(sortCriteria).toArray();
       res.send(result)
     })
     app.get("/prison/:email", async (req, res) => {
@@ -702,17 +705,20 @@ async function run() {
     })
 
     app.get("/users", async (req, res) => {
-      const result = await usersCollection.find().toArray();
+      let sortCriteria = { createdAt: -1 };
+      const result = await usersCollection.find().sort(sortCriteria).toArray();
       res.send(result)
     })
     app.get("/customers", async (req, res) => {
-      const filter = { userRole: "user" }
-      const result = await usersCollection.find(filter).toArray();
+      const filter = { userRole: "user" };
+      let sortCriteria = { createdAt: -1 };
+      const result = await usersCollection.find(filter).sort(sortCriteria).toArray();
       res.send(result)
     })
     app.get("/artists", async (req, res) => {
-      const filter = { userRole: "artist" }
-      const result = await usersCollection.find(filter).toArray();
+      const filter = { userRole: "artist" };
+      let sortCriteria = { createdAt: -1 };
+      const result = await usersCollection.find(filter).sort(sortCriteria).toArray();
       res.send(result)
     })
 
@@ -753,7 +759,9 @@ async function run() {
     })
 
     app.post("/users", async (req, res) => {
-      const user = req.body;
+      let user = req.body;
+      const createdAt = new Date();
+      user.createdAt = createdAt;
       const query = { email: user.email }
       const existist = await usersCollection.findOne(query);
       if (existist) {
