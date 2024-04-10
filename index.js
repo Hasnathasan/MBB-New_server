@@ -2490,12 +2490,28 @@ async function run() {
       res.send(result)
     })
 
+    app.get("/taxAndShippingDataByStateAndZip", async (req, res) => {
+      const state = req.query.state;
+      const zipCode = req.query.zipCode;
+  
+      // Perform case-insensitive search for state
+      const shippingData = await taxAndShippingMethodCollection.findOne({ states: { $regex: new RegExp(state, 'i') }, zipCode: zipCode });
+  
+      if (shippingData) {
+          // Extract shipping_methods property and send it
+          const { shipping_methods } = shippingData;
+          res.send({ shipping_methods });
+      } else {
+          res.status(404).send("Shipping data not found for the provided state and zip code.");
+      }
+  });
+
 
     app.post("/taxAndShippingMethod", async (req, res) => {
       const data = req.body;
       
       // Check if the state already exists
-      const existingState = await taxAndShippingMethodCollection.findOne({ states: data.states });
+      const existingState = await taxAndShippingMethodCollection.findOne({ state: { $regex: new RegExp(data.states, 'i') } });
       if (existingState) {
           res.status(400).send("State already exists.");
           return;
@@ -2517,6 +2533,19 @@ async function run() {
     const id = req.params.id;
     const filter = {_id: new ObjectId(id)};
     const result = await taxAndShippingMethodCollection.deleteOne(filter);
+    res.send(result)
+  })
+
+  app.patch("/taxAndShippingMethodUpdate/:id", async(req, res) => {
+    const id = req.params.id;
+    const filter = {_id: new ObjectId(id)};
+    const data = req.body;
+    const updateDoc = {
+      $set: {
+        ...data
+      }
+    };
+    const result = await taxAndShippingMethodCollection.updateOne(filter, updateDoc);
     res.send(result)
   })
 
