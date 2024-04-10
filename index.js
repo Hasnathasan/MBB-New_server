@@ -103,6 +103,7 @@ async function run() {
     const salesReportCollection = db.collection('sales-report');
     const bannerImageCollection = db.collection('bannar-images');
     const SystemSettingCollection = db.collection('system-settings');
+    const taxAndShippingMethodCollection = db.collection('tax-shipping');
 
 
 
@@ -2484,6 +2485,34 @@ async function run() {
       res.send(result)
     })
 
+    app.get("/taxAndShippingData", async(req, res) => {
+      const result = await taxAndShippingMethodCollection.find().toArray();
+      res.send(result)
+    })
+
+
+    app.post("/taxAndShippingMethod", async (req, res) => {
+      const data = req.body;
+      
+      // Check if the state already exists
+      const existingState = await taxAndShippingMethodCollection.findOne({ states: data.states });
+      if (existingState) {
+          res.status(400).send("State already exists.");
+          return;
+      }
+  
+      // Check if the zip code already exists
+      const existingZipCode = await taxAndShippingMethodCollection.findOne({ zipCode: data.zipCode });
+      if (existingZipCode) {
+          res.status(400).send("Zip code already exists.");
+          return;
+      }
+  
+      // If neither the state nor the zip code exists, insert the data
+      const result = await taxAndShippingMethodCollection.insertOne(data);
+      res.send(result);
+  });
+
 
 
     app.get('/artist-sales/:artistEmail', async (req, res) => {
@@ -2558,6 +2587,8 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+
 
 
 
