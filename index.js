@@ -1589,7 +1589,7 @@ async function run() {
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:0px 15px 5px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; line-height: 140%; text-align: right; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="color: #0d83dd; font-size: 14px; line-height: 19.6px;"><strong><span style="font-size: 20px; line-height: 28px;">$${order?.total_price} </span></strong></span></p>
+              <p style="font-size: 14px; line-height: 140%;"><span style="color: #141414; font-size: 14px; line-height: 19.6px;"><strong><span style="font-size: 20px; line-height: 28px;">$${order?.total_price} </span></strong></span></p>
             </div>
           
                 </td>
@@ -1625,7 +1625,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:15px 0px 10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <table height="0px" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;border-top: 3px dashed #0d83dd;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+            <table height="0px" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;border-top: 3px dashed #141414;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
               <tbody>
                 <tr style="vertical-align: top">
                   <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top;font-size: 0px;line-height: 0px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
@@ -1668,7 +1668,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 10px 15px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #141414; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Product Name </strong></span></p>
             </div>
           
@@ -1691,7 +1691,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #141414; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Price </strong></span></p>
             </div>
           
@@ -1714,7 +1714,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #141414; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Qty </strong></span></p>
             </div>
           
@@ -1737,7 +1737,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 15px 10px 10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: right; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #141414; line-height: 140%; text-align: right; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Amount</strong></span></p>
             </div>
           
@@ -1812,7 +1812,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 5px 15px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #1f2021; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%; text-transform: capitalize;"><strong>${product?.product_name}</strong></p>
             </div>
           
@@ -1835,7 +1835,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #1f2021; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><strong>$ ${product?.price?.sale_price || product?.price?.regular_price}</strong></p>
             </div>
           
@@ -1858,7 +1858,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #1f2021; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><strong>${product?.quantity}</strong></p>
             </div>
           
@@ -1881,7 +1881,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 15px 10px 10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 140%; text-align: right; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #1f2021; line-height: 140%; text-align: right; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><strong>$ ${(product?.price?.sale_price || product?.price?.regular_price) * product?.quantity}</strong></p>
             </div>
           
@@ -2019,7 +2019,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 5px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #141414; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Sub Total</strong></span></p>
             </div>
           
@@ -2042,8 +2042,135 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 15px 10px 10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 140%; text-align: right; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px;"><strong>$ ${order?.total_price}</strong></span></p>
+            <div class="v-text-align" style="font-size: 14px; color: #1f2021; line-height: 140%; text-align: right; word-wrap: break-word;">
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px;"><strong>$ ${order?.subTotal}</strong></span></p>
+            </div>
+          
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+            </div>
+          </div>
+          <!--[if (mso)|(IE)]></td><![endif]-->
+                <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
+              </div>
+            </div>
+            </div>
+
+
+
+
+
+
+          <div class="u-row-container" style="padding: 0px;background-color: transparent">
+            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
+              <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
+                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #ffffff;"><![endif]-->
+                
+          <!--[if (mso)|(IE)]><td align="center" width="179" style="width: 179px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
+          <div class="u-col u-col-29p84" style="max-width: 320px;min-width: 179.04px;display: table-cell;vertical-align: top;">
+            <div style="height: 100%;width: 100% !important;">
+            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
+            
+          <table class="hide-mobile" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+            <tbody>
+              <tr>
+                <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
+                  
+            <table height="0px" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;border-top: 0px solid #BBBBBB;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+              <tbody>
+                <tr style="vertical-align: top">
+                  <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top;font-size: 0px;line-height: 0px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+                    <span>&#160;</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+            </div>
+          </div>
+          <!--[if (mso)|(IE)]></td><![endif]-->
+          <!--[if (mso)|(IE)]><td align="center" width="115" style="width: 115px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
+          <div class="u-col u-col-19p33" style="max-width: 320px;min-width: 115.98px;display: table-cell;vertical-align: top;">
+            <div style="height: 100%;width: 100% !important;">
+            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
+            
+          <table class="hide-mobile" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+            <tbody>
+              <tr>
+                <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
+                  
+            <table height="0px" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse;table-layout: fixed;border-spacing: 0;mso-table-lspace: 0pt;mso-table-rspace: 0pt;vertical-align: top;border-top: 0px solid #BBBBBB;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+              <tbody>
+                <tr style="vertical-align: top">
+                  <td style="word-break: break-word;border-collapse: collapse !important;vertical-align: top;font-size: 0px;line-height: 0px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%">
+                    <span>&#160;</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+            </div>
+          </div>
+          <!--[if (mso)|(IE)]></td><![endif]-->
+          <!--[if (mso)|(IE)]><td align="center" width="141" style="width: 141px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
+          <div class="u-col u-col-23p66" style="max-width: 320px;min-width: 141.96px;display: table-cell;vertical-align: top;">
+            <div style="height: 100%;width: 100% !important;">
+            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
+            
+          <table id="u_content_text_48" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+            <tbody>
+              <tr>
+                <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 5px;font-family:'Montserrat',sans-serif;" align="left">
+                  
+            <div class="v-text-align" style="font-size: 14px; color: #141414; line-height: 140%; text-align: left; word-wrap: break-word;">
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>
+              ${order?.shippingMethod?.standard_shipping ? `Standard Shipping:` : ""}
+                  ${order?.shippingMethod?.express_shipping ? `Express Shipping:` : ""}
+                  ${order?.shippingMethod?.free_shipping == 0 ? `Free Shipping:` : ""}
+              </strong></span></p>
+            </div>
+          
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          
+            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
+            </div>
+          </div>
+          <!--[if (mso)|(IE)]></td><![endif]-->
+          <!--[if (mso)|(IE)]><td align="center" width="163" style="width: 163px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
+          <div class="u-col u-col-27p17" style="max-width: 320px;min-width: 163.02px;display: table-cell;vertical-align: top;">
+            <div style="height: 100%;width: 100% !important;">
+            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;"><!--<![endif]-->
+            
+          <table id="u_content_text_52" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+            <tbody>
+              <tr>
+                <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 15px 10px 10px;font-family:'Montserrat',sans-serif;" align="left">
+                  
+            <div class="v-text-align" style="font-size: 14px; color: #1f2021; line-height: 140%; text-align: right; word-wrap: break-word;">
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px;"><strong>
+              ${order?.shippingMethod?.standard_shipping ? `$${order?.shippingMethod?.standard_shipping}` : ""}
+              ${order?.shippingMethod?.express_shipping ? `$${order?.shippingMethod?.express_shipping}` : ""}
+              ${order?.shippingMethod?.free_shipping == 0 ? `${order?.shippingMethod?.free_shipping}` : ""}
+              </strong></span></p>
             </div>
           
                 </td>
@@ -2137,7 +2264,7 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 5px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #0d83dd; line-height: 140%; text-align: left; word-wrap: break-word;">
+            <div class="v-text-align" style="font-size: 14px; color: #141414; line-height: 140%; text-align: left; word-wrap: break-word;">
               <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;"><strong>Tax</strong></span></p>
             </div>
           
@@ -2160,8 +2287,8 @@ async function run() {
               <tr>
                 <td class="v-container-padding-padding" style="overflow-wrap:break-word;word-break:break-word;padding:10px 15px 10px 10px;font-family:'Montserrat',sans-serif;" align="left">
                   
-            <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 140%; text-align: right; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px;"><strong>$ 00.00</strong></span></p>
+            <div class="v-text-align" style="font-size: 14px; color: #1f2021; line-height: 140%; text-align: right; word-wrap: break-word;">
+              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px;"><strong>$ ${order?.tax}</strong></span></p>
             </div>
           
                 </td>
@@ -2183,9 +2310,9 @@ async function run() {
             
             
           <div class="u-row-container" style="padding: 0px;background-color: transparent">
-            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #0d83dd;">
+            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #141414;">
               <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
-                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #0d83dd;"><![endif]-->
+                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #141414;"><![endif]-->
                 
           <!--[if (mso)|(IE)]><td align="center" width="179" style="width: 179px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
           <div class="u-col u-col-29p84" style="max-width: 320px;min-width: 179.04px;display: table-cell;vertical-align: top;">
@@ -2301,9 +2428,9 @@ async function run() {
             
             
           <div class="u-row-container" style="padding: 0px;background-color: transparent">
-            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #34495e;">
+            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #1f2021;">
               <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
-                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #34495e;"><![endif]-->
+                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #1f2021;"><![endif]-->
                 
           <!--[if (mso)|(IE)]><td align="center" width="600" style="width: 600px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 0px solid transparent;border-bottom: 0px solid transparent;" valign="top"><![endif]-->
           <div class="u-col u-col-100" style="max-width: 320px;min-width: 600px;display: table-cell;vertical-align: top;">
@@ -2499,14 +2626,14 @@ async function run() {
 
     if (stateShippingData) {
         // If state data found, send its shipping_methods
-        res.send({ shipping_methods: stateShippingData.shipping_methods });
+        res.send({ shipping_methods: stateShippingData.shipping_methods, tax_rate: stateShippingData?.tax_rate });
     } else {
         // If state data not found, search by zip code
         const zipCodeShippingData = await taxAndShippingMethodCollection.findOne({ zipCode: zipCode });
 
         if (zipCodeShippingData) {
             // If zip code data found, send its shipping_methods
-            res.send({ shipping_methods: zipCodeShippingData.shipping_methods });
+            res.send({ shipping_methods: zipCodeShippingData.shipping_methods, tax_rate: stateShippingData?.tax_rate });
         } else {
             // If neither state nor zip code data found, send 404
             res.status(404).send("Shipping data not found for the provided state and zip code.");
@@ -2519,7 +2646,7 @@ async function run() {
       const data = req.body;
       
       // Check if the state already exists
-      const existingState = await taxAndShippingMethodCollection.findOne({ state: { $regex: new RegExp(data.states, 'i') } });
+      const existingState = await taxAndShippingMethodCollection.findOne({ states: { $regex: new RegExp(data.states, 'i') } });
       if (existingState) {
           res.status(400).send("State already exists.");
           return;
