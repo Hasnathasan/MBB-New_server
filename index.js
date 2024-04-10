@@ -2492,18 +2492,26 @@ async function run() {
 
     app.get("/taxAndShippingDataByStateAndZip", async (req, res) => {
       const state = req.query.state;
-      const zipCode = req.query.zipCode;
-  
-      // Perform case-insensitive search for state
-      const shippingData = await taxAndShippingMethodCollection.findOne({ states: { $regex: new RegExp(state, 'i') }, zipCode: zipCode });
-  
-      if (shippingData) {
-          // Extract shipping_methods property and send it
-          const { shipping_methods } = shippingData;
-          res.send({ shipping_methods });
-      } else {
-          res.status(404).send("Shipping data not found for the provided state and zip code.");
-      }
+    const zipCode = req.query.zipCode;
+
+    // Perform case-insensitive search for the exact state name
+    const stateShippingData = await taxAndShippingMethodCollection.findOne({ states: { $regex: new RegExp(`^${state}$`, 'i') } });
+
+    if (stateShippingData) {
+        // If state data found, send its shipping_methods
+        res.send({ shipping_methods: stateShippingData.shipping_methods });
+    } else {
+        // If state data not found, search by zip code
+        const zipCodeShippingData = await taxAndShippingMethodCollection.findOne({ zipCode: zipCode });
+
+        if (zipCodeShippingData) {
+            // If zip code data found, send its shipping_methods
+            res.send({ shipping_methods: zipCodeShippingData.shipping_methods });
+        } else {
+            // If neither state nor zip code data found, send 404
+            res.status(404).send("Shipping data not found for the provided state and zip code.");
+        }
+    }
   });
 
 
