@@ -2513,6 +2513,13 @@ async function run() {
       res.send(result);
   });
 
+  app.delete("/taxAndShippingDelete/:id", async(req, res) => {
+    const id = req.params.id;
+    const filter = {_id: new ObjectId(id)};
+    const result = await taxAndShippingMethodCollection.deleteOne(filter);
+    res.send(result)
+  })
+
 
 
     app.get('/artist-sales/:artistEmail', async (req, res) => {
