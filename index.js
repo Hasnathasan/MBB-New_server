@@ -2612,77 +2612,77 @@ async function run() {
       res.send(result)
     })
 
-    app.get("/taxAndShippingData", async(req, res) => {
+    app.get("/taxAndShippingData", async (req, res) => {
       const result = await taxAndShippingMethodCollection.find().toArray();
       res.send(result)
     })
 
     app.get("/taxAndShippingDataByStateAndZip", async (req, res) => {
       const state = req.query.state;
-    const zipCode = req.query.zipCode;
+      const zipCode = req.query.zipCode;
 
-    // Perform case-insensitive search for the exact state name
-    const stateShippingData = await taxAndShippingMethodCollection.findOne({ states: { $regex: new RegExp(`^${state}$`, 'i') } });
+      // Perform case-insensitive search for the exact state name
+      const stateShippingData = await taxAndShippingMethodCollection.findOne({ states: { $regex: new RegExp(`^${state}$`, 'i') } });
 
-    if (stateShippingData) {
+      if (stateShippingData) {
         // If state data found, send its shipping_methods
         res.send({ shipping_methods: stateShippingData.shipping_methods, tax_rate: stateShippingData?.tax_rate });
-    } else {
+      } else {
         // If state data not found, search by zip code
         const zipCodeShippingData = await taxAndShippingMethodCollection.findOne({ zipCode: zipCode });
 
         if (zipCodeShippingData) {
-            // If zip code data found, send its shipping_methods
-            res.send({ shipping_methods: zipCodeShippingData.shipping_methods, tax_rate: stateShippingData?.tax_rate });
+          // If zip code data found, send its shipping_methods
+          res.send({ shipping_methods: zipCodeShippingData.shipping_methods, tax_rate: stateShippingData?.tax_rate });
         } else {
-            // If neither state nor zip code data found, send 404
-            res.status(404).send("Shipping data not found for the provided state and zip code.");
+          // If neither state nor zip code data found, send 404
+          res.status(404).send("Shipping data not found for the provided state and zip code.");
         }
-    }
-  });
+      }
+    });
 
 
     app.post("/taxAndShippingMethod", async (req, res) => {
       const data = req.body;
-      
+
       // Check if the state already exists
       const existingState = await taxAndShippingMethodCollection.findOne({ states: { $regex: new RegExp(data.states, 'i') } });
       if (existingState) {
-          res.status(400).send("State already exists.");
-          return;
+        res.status(400).send("State already exists.");
+        return;
       }
-  
+
       // Check if the zip code already exists
       const existingZipCode = await taxAndShippingMethodCollection.findOne({ zipCode: data.zipCode });
       if (existingZipCode) {
-          res.status(400).send("Zip code already exists.");
-          return;
+        res.status(400).send("Zip code already exists.");
+        return;
       }
-  
+
       // If neither the state nor the zip code exists, insert the data
       const result = await taxAndShippingMethodCollection.insertOne(data);
       res.send(result);
-  });
+    });
 
-  app.delete("/taxAndShippingDelete/:id", async(req, res) => {
-    const id = req.params.id;
-    const filter = {_id: new ObjectId(id)};
-    const result = await taxAndShippingMethodCollection.deleteOne(filter);
-    res.send(result)
-  })
+    app.delete("/taxAndShippingDelete/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const result = await taxAndShippingMethodCollection.deleteOne(filter);
+      res.send(result)
+    })
 
-  app.patch("/taxAndShippingMethodUpdate/:id", async(req, res) => {
-    const id = req.params.id;
-    const filter = {_id: new ObjectId(id)};
-    const data = req.body;
-    const updateDoc = {
-      $set: {
-        ...data
-      }
-    };
-    const result = await taxAndShippingMethodCollection.updateOne(filter, updateDoc);
-    res.send(result)
-  })
+    app.patch("/taxAndShippingMethodUpdate/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const data = req.body;
+      const updateDoc = {
+        $set: {
+          ...data
+        }
+      };
+      const result = await taxAndShippingMethodCollection.updateOne(filter, updateDoc);
+      res.send(result)
+    })
 
 
 
