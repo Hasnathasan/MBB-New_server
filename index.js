@@ -2642,6 +2642,8 @@ async function run() {
     });
 
 
+
+
     app.post("/taxAndShippingMethod", async (req, res) => {
       const data = req.body;
 
@@ -2664,12 +2666,16 @@ async function run() {
       res.send(result);
     });
 
+
+
     app.delete("/taxAndShippingDelete/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const result = await taxAndShippingMethodCollection.deleteOne(filter);
       res.send(result)
     })
+
+
 
     app.patch("/taxAndShippingMethodUpdate/:id", async (req, res) => {
       const id = req.params.id;
@@ -2683,6 +2689,8 @@ async function run() {
       const result = await taxAndShippingMethodCollection.updateOne(filter, updateDoc);
       res.send(result)
     })
+
+    
 
 
 
