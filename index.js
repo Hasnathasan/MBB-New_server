@@ -735,19 +735,51 @@ async function run() {
       try {
         const userData = req.body; // Extract user data from request body
         const { email, password, userName } = userData;
-
-        if (!email || !password || !userName) {
-          return res.status(400).send({ message: 'Missing required fields' });
+        if(email){
+          const existingUser = await usersCollection.findOne({email});
+          if(existingUser){
+            return res.status(500).send({ message: "This email has already been taken" })
+          }
         }
 
-        const createdUser = await admin.auth().createUser({
+        if(email && password){
+          const createdUser = await admin.auth().createUser({
           email,
           password,
-          userName,
+          userName
         });
+        }
+
+        
         const postUser = await usersCollection.insertOne(userData);
         res.status(201).send({ message: `Successfully created user` });
       } catch (error) {
+        console.error(error);
+        res.status(500).send({ message: error?.message });
+      }
+    })
+
+
+    app.patch("/createLogin/:id", async(req, res) => {
+      try{
+        const {email, password, userName} = req.body;
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const createdUser = await admin.auth().createUser({
+        email,
+        password,
+        userName
+      });
+
+      const updateDoc = {
+        $set: {
+          email
+        }
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc)
+      res.send(result)
+      }
+      catch (error){
         console.error(error);
         res.status(500).send({ message: error?.message });
       }
