@@ -203,7 +203,7 @@ async function run() {
     })
 
 
-    app.patch("/system-setting-update/:id", async (req, res) => {
+    app.put("/system-setting-update/:id", async (req, res) => {
       const id = req.params.id;
       const { system_name, email, phone_number, logo } = req.body;
       console.log(req.body);
@@ -511,7 +511,7 @@ async function run() {
         res.send(result);
       }
       console.log(category, priceSlider, minRating, searchQuery, sort, tag);
-      let sortQuery = {"createdAt": -1};
+      let sortQuery = { "createdAt": -1 };
       if (sort == "newest") {
         sortQuery = { "createdAt": -1 };
       }
@@ -725,7 +725,7 @@ async function run() {
 
     app.get("/artist/:id", async (req, res) => {
       const id = req.params.id;
-      const filter = {_id: new ObjectId(id)}
+      const filter = { _id: new ObjectId(id) }
       const result = await usersCollection.findOne(filter);
       res.send(result);
     })
@@ -735,22 +735,22 @@ async function run() {
       try {
         const userData = req.body; // Extract user data from request body
         const { email, password, userName } = userData;
-        if(email){
-          const existingUser = await usersCollection.findOne({email});
-          if(existingUser){
+        if (email) {
+          const existingUser = await usersCollection.findOne({ email });
+          if (existingUser) {
             return res.status(500).send({ message: "refetch" })
           }
         }
 
-        if(email && password){
+        if (email && password) {
           const createdUser = await admin.auth().createUser({
-          email,
-          password,
-          userName
-        });
+            email,
+            password,
+            userName
+          });
         }
 
-        
+
         const postUser = await usersCollection.insertOne(userData);
         res.status(201).send({ message: `Successfully created user` });
       } catch (error) {
@@ -760,26 +760,26 @@ async function run() {
     })
 
 
-    app.patch("/createLogin/:id", async(req, res) => {
-      try{
-        const {email, password, userName} = req.body;
-      const id = req.params.id;
-      const filter = {_id: new ObjectId(id)}
-      const createdUser = await admin.auth().createUser({
-        email,
-        password,
-        userName
-      });
+    app.patch("/createLogin/:id", async (req, res) => {
+      try {
+        const { email, password, userName } = req.body;
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) }
+        const createdUser = await admin.auth().createUser({
+          email,
+          password,
+          userName
+        });
 
-      const updateDoc = {
-        $set: {
-          email
-        }
-      };
-      const result = await usersCollection.updateOne(filter, updateDoc)
-      res.send(result)
+        const updateDoc = {
+          $set: {
+            email
+          }
+        };
+        const result = await usersCollection.updateOne(filter, updateDoc)
+        res.send(result)
       }
-      catch (error){
+      catch (error) {
         console.error(error);
         res.status(500).send({ message: error?.message });
       }
@@ -2722,7 +2722,7 @@ async function run() {
       res.send(result)
     })
 
-    
+
 
 
 
