@@ -381,7 +381,7 @@ async function run() {
     app.post("/products", async (req, res) => {
       const product = req.body;
       const addedBy = product?.addedBy;
-      const filter = { email: addedBy };
+      const filter = { _id: new ObjectId(addedBy) };
       const updateDoc = {
         $inc: { total_products: 1 }
       }
@@ -511,7 +511,7 @@ async function run() {
         res.send(result);
       }
       console.log(category, priceSlider, minRating, searchQuery, sort, tag);
-      let sortQuery = {};
+      let sortQuery = {"createdAt": -1};
       if (sort == "newest") {
         sortQuery = { "createdAt": -1 };
       }
@@ -723,10 +723,10 @@ async function run() {
       res.send(result)
     })
 
-    app.get("/artist/:email", async (req, res) => {
-      const email = req.params.email;
-      console.log(email);
-      const result = await usersCollection.findOne({ email });
+    app.get("/artist/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)}
+      const result = await usersCollection.findOne(filter);
       res.send(result);
     })
 
@@ -738,7 +738,7 @@ async function run() {
         if(email){
           const existingUser = await usersCollection.findOne({email});
           if(existingUser){
-            return res.status(500).send({ message: "This email has already been taken" })
+            return res.status(500).send({ message: "refetch" })
           }
         }
 
@@ -1002,9 +1002,9 @@ async function run() {
       }
     });
 
-    app.get("/eachArtistProducts/:email", async (req, res) => {
-      const email = req.params.email;
-      const filter = { addedBy: email };
+    app.get("/eachArtistProducts/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { addedBy: id };
       const result = await productsCollection.find(filter).toArray();
       res.send(result)
     })
@@ -2547,23 +2547,23 @@ async function run() {
 
 
     app.get('/sales-report', async (req, res) => {
-      const artistEmail = req.query.artistEmail;
-      if (!artistEmail) {
-        return res.status(500).json({ error: 'Artist email not provided' });
+      const artistId = req.query.artistId;
+      if (!artistId) {
+        return res.status(500).json({ error: 'Artist ID not provided' });
       }
 
       try {
         // Check if there are any unreported sales reports for the artist
-        const existingReports = await salesReportCollection.find({ artistEmail, isReportGenerated: false }).toArray();
+        const existingReports = await salesReportCollection.find({ artistId, isReportGenerated: false }).toArray();
         // console.log(existingReports);
         if (existingReports.length > 0) {
           // If there are unreported sales reports, return the first one found
-          return res.json({ _id: existingReports[0]._id, artistEmail, products: existingReports[0].products, status: existingProducts[0].status, isReportGenerated: false });
+          return res.json({ _id: existingReports[0]._id, artistId, products: existingReports[0].products, status: existingProducts[0].status, isReportGenerated: false });
         }
 
         // Collect products from ordersCollection for the specified artistEmail
         const orders = await ordersCollection.find({
-          'products.artist_details.artist': artistEmail,
+          'products.artist_details.artist': artistId,
           'status': 'delivered'
         }).toArray();
         // console.log(orders);
@@ -2573,7 +2573,7 @@ async function run() {
         }
         // Extract products sold by the artist from the orders and add order_id to each product
         const artistProducts = orders.reduce((acc, order) => {
-          const products = order.products.filter(product => product.artist_details.artist === artistEmail);
+          const products = order.products.filter(product => product.artist_details.artist === artistId);
           return acc.concat(products.map(product => ({ ...product, order_id: order._id.toString() })));
         }, []);
         // console.log(artistProducts);
@@ -2587,10 +2587,10 @@ async function run() {
           return res.json({ products: newArtistProducts });
         }
         // Insert new sales report into the salesReportCollection
-        const insertResult = await salesReportCollection.insertOne({ artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
+        const insertResult = await salesReportCollection.insertOne({ artistId, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
 
         // Return the inserted sales report along with its _id and new products
-        return res.json({ _id: insertResult.insertedId, artistEmail, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
+        return res.json({ _id: insertResult.insertedId, artistId, products: newArtistProducts, status: 'unpaid', isReportGenerated: true });
       } catch (error) {
         console.error('Error retrieving or updating artist products:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -2726,14 +2726,14 @@ async function run() {
 
 
 
-    app.get('/artist-sales/:artistEmail', async (req, res) => {
+    app.get('/artist-sales/:artistId', async (req, res) => {
       try {
-        const artistEmail = req.params.artistEmail;
+        const artistId = req.params.artistId;
         // Find orders where artist added the product
         const orders = await ordersCollection.find({
           'products': {
             $elemMatch: {
-              'artist_details.artist': artistEmail
+              'artist_details.artist': artistId
             }
           }
         }).toArray();
@@ -2745,7 +2745,7 @@ async function run() {
         // Calculate total profits
         orders.forEach(order => {
           order.products.forEach(product => {
-            if (product?.artist_details?.artist === artistEmail) {
+            if (product?.artist_details?.artist === artistId) {
               const quantity = product.quantity;
               const artistTotal = product.profit_distribution.artist_profit_details.artistTotal;
               const websiteProfit = product.profit_distribution.website_profit_details.websiteProfit;
@@ -2758,7 +2758,7 @@ async function run() {
         });
 
         res.json({
-          artistEmail,
+          artistId,
           totalArtistProfit,
           totalWebsiteProfit,
           totalPrisonProfit
@@ -2801,7 +2801,8 @@ app.listen(port, () => {
 
 
 
-
+// 01791602274
+// Kamrun apu: 01774524189
 
 
 
