@@ -1228,10 +1228,10 @@ async function run() {
     })
 
 
-    app.patch("/updateArtist/:email", async (req, res) => {
-      const email = req.params.email;
+    app.patch("/updateArtist/:id", async (req, res) => {
+      const id = req.params.id;
       const artistUpdatedData = req.body;
-      const filter = { email };
+      const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
           ...artistUpdatedData
