@@ -203,7 +203,7 @@ async function run() {
     })
 
 
-    app.put("/system-setting-update/:id", async (req, res) => {
+    app.patch("/system-setting-update/:id", async (req, res) => {
       const id = req.params.id;
       const { system_name, email, phone_number, logo } = req.body;
       console.log(req.body);
@@ -2803,6 +2803,61 @@ app.listen(port, () => {
 
 // 01791602274
 // Kamrun apu: 01774524189
+
+
+/*
+
+
+
+
+
+Pakhi sob vul ki sudhu amari chilo? Sob dos sudhu amr uporei chapiye diye gelen? 
+
+Hae ami jani je ami onekgulo vul korchi but apnaro akta vul chilo. Ami apnar study te kokhono disturb korte chaii ni but apni amake baddho korchen apnake disturb korte.
+
+Apni amake kokhon unfriend korten pakhi? Aktu vebe dekhen to.
+
+Ami jokhoni apnake disturb kora off kortam, apnake message ditam na, apni rege gele apnake niye post kortam na - thik tokhoni apni unfriend korten. Amr ki kora chilo pakhi?
+Apnar unfriend kore deoar por sobkichu ki sekhanei sesh kore deoa uchit chilo? Na pakhi, seta korle ami apnake hariye feltam.
+
+Kno bujhten na apni? Apni just mukhei bolten je apnake jno ai koyekta month disturb na korii but korten to onno kichu..! 
+
+I love you pakhi. Ki bolchilam apnake vule gechen? Ami apnake je kotota valobashi seta apnar imagination ar baire.
+
+Apni to just akbar unfriend koren ni. Barbar sei same jinis tai same reason ar jonnoi kore gechen. Ami bujhtechilam na je amr ki kora uchit chilo.
+
+Kauke hariye felar kotota voy kaj korte pare akjoner moddhe, bujhen apni? Bujhen na..! 
+
+Amr ai sobkichur majhe just vul guloi khuje beran apni. Ami koyta vul korlam, koyta vul kotha bollam - apni just aiguloi count koren. 
+
+Amr ai stupid kaj gulor majhe onno kichu khuje pan na pakhi?
+
+Kotota stupid ami, tai na? Kotota stupid hote parle ami ai type ar post gulo continiously kore jaite pari. Nijer stupidity gulo day by day just berei jacche. 
+Nijer ai stupid post gulote nijeri haha dite iccha kortechi.
+
+Asolei pakhi, sobtheke boro vul ta ami nijei korchi. Amr uchit eii hoyni akhon ai time tate apnar life a asar. Akdom exam ar por aslei valo hoito. But ki kortam pakhi? Ami partam na, just voy hoito je apnar ar amr majhe onno keu na chole ase.
+
+Janina apnake hariye fellam ki na but akhon apnake disturb korteo khub voy hocche. Apnar sathe akhon kotha bolte gele apni just vul eii bujhben.
+
+Ami akhon just amader moddhokar ai vul bujhabujhi ta mitiye nite chaichilam. But apni setao hote dicchen na. Unblock korte bollam, setao korlen na.
+
+Jani na pakhi, ami sotti bujhtechina ki korbo, ki kora uchit hobe amr..!
+
+
+
+Aibar ak new apnake dekhlam, chinlam. Ami kokhono vabteo parii nii je pakhi rat 2/3 tar dike amr sathe kotha bole ai emoji(🙂) ta hajarbar dite pare.
+Khub miss kortechi amader sei stupid emoji competition ta ke, miss kortechi apnar sathe kotha bole puro rat katiye deoa and also apnake khub miss kortechi.
+
+Ami jani ai time ta aigulor jonno na but ami bujhi ni amr jonno apnar study te atota problem hoite pare. I'm sorry and I love you pakhi
+
+Apni akta kotha bolchilen,
+                "Time changes Everything, Everything means everything"
+Apni ata nijer khettrei bolchilen. Koto easily sobkichu vule gelen apni. Kivabe paren pakhi? Amakeo aktu sikhiye diye jaiten kivabe vule jete hoy, kivabe valo thakte hoy. But sorry pakhi, apni sikhiye diye geleo ami apnake vulte partam na and kokhono seta chai ow na.
+
+Let's see pakhi, time amake kotota change korte pare.
+
+
+*/
 
 
 
