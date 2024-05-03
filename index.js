@@ -8,22 +8,17 @@ var admin = require("firebase-admin");
 const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 
-// const transporter = nodemailer.createTransport(mailgunTransport({
-//   auth: {
-//     api_key: process.env.MAILGUN_API_KEY, // Your Mailgun API key
-//     domain: process.env.MAILGUN_DOMAIN    // Your Mailgun domain
-//   }
-// }));
+
 
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'hasnatoooooooo@gmail.com',
-    pass: 'buiy ogak zilt shzu'
+    user: 'webdev206804@gmail.com',
+    pass: process.env.GOOGLE_APP_PASS
   }
 });
-console.log(process.env.DB_USER);
+
 
 
 const fileUpload = require('express-fileupload');
@@ -1489,7 +1484,7 @@ async function run() {
                 <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 10px 10px 15px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 14px; color: #34495e; line-height: 150%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 150%;"><span style="font-size: 11pt; font-family: Arial, sans-serif; color: #000000; white-space-collapse: preserve; line-height: 21px;">Just to let you know — we've received your order ${order?._id?.slice(24, -1)}, and it is now being processed:</span></p>
+              <p style="font-size: 14px; line-height: 150%;"><span style="font-size: 11pt; font-family: Arial, sans-serif; color: #000000; white-space-collapse: preserve; line-height: 21px;">Just to let you know — we've received your order ${order?._id}, and it is now being processed:</span></p>
             </div>
           
                 </td>
@@ -1642,10 +1637,10 @@ async function run() {
                 <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
                   <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #ffffff;"><![endif]-->
                   
-            <!--[if (mso)|(IE)]><td align="center" width="198" style="background-color: #ebebef;width: 198px;padding: 0px;border-top: 0px solid transparent;border-left: 1px solid #2d2d2d;border-right: 1px solid #323232;border-bottom: 1px solid #323232;" valign="top"><![endif]-->
+            <!--[if (mso)|(IE)]><td align="center" width="198" style="background-color: #ebebef;width: 198px;padding: 0px;border-top: 1px solid #3b3a3a;border-left: 1px solid #3b3a3a;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #3b3a3a;" valign="top"><![endif]-->
             <div class="u-col u-col-33p33" style="max-width: 320px;min-width: 200px;display: table-cell;vertical-align: top;">
               <div style="background-color: #ebebef;height: 100%;width: 100% !important;">
-              <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 1px solid #2d2d2d;border-right: 1px solid #323232;border-bottom: 1px solid #323232;"><!--<![endif]-->
+              <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 1px solid #3b3a3a;border-left: 1px solid #3b3a3a;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #3b3a3a;"><!--<![endif]-->
               
             <table id="u_content_text_21" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
               <tbody>
@@ -1665,10 +1660,10 @@ async function run() {
               </div>
             </div>
             <!--[if (mso)|(IE)]></td><![endif]-->
-            <!--[if (mso)|(IE)]><td align="center" width="199" style="background-color: #e8e8e8;width: 199px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3c3b3b;border-bottom: 1px solid #323232;" valign="top"><![endif]-->
+            <!--[if (mso)|(IE)]><td align="center" width="199" style="background-color: #e8e8e8;width: 199px;padding: 0px;border-top: 1px solid #3b3a3a;border-left: 0px solid transparent;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #3b3a3a;" valign="top"><![endif]-->
             <div class="u-col u-col-33p33" style="max-width: 320px;min-width: 200px;display: table-cell;vertical-align: top;">
               <div style="background-color: #e8e8e8;height: 100%;width: 100% !important;">
-              <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3c3b3b;border-bottom: 1px solid #323232;"><!--<![endif]-->
+              <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 1px solid #3b3a3a;border-left: 0px solid transparent;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #3b3a3a;"><!--<![endif]-->
               
             <table id="u_content_text_22" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
               <tbody>
@@ -1688,10 +1683,10 @@ async function run() {
               </div>
             </div>
             <!--[if (mso)|(IE)]></td><![endif]-->
-            <!--[if (mso)|(IE)]><td align="center" width="199" style="background-color: #e8e6e6;width: 199px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3c3c3c;border-bottom: 1px solid #323232;" valign="top"><![endif]-->
+            <!--[if (mso)|(IE)]><td align="center" width="199" style="background-color: #e8e6e6;width: 199px;padding: 0px;border-top: 1px solid #3b3a3a;border-left: 0px solid transparent;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #3b3a3a;" valign="top"><![endif]-->
             <div class="u-col u-col-33p33" style="max-width: 320px;min-width: 200px;display: table-cell;vertical-align: top;">
               <div style="background-color: #e8e6e6;height: 100%;width: 100% !important;">
-              <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3c3c3c;border-bottom: 1px solid #323232;"><!--<![endif]-->
+              <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 1px solid #3b3a3a;border-left: 0px solid transparent;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #3b3a3a;"><!--<![endif]-->
               
             <table id="u_content_text_23" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
               <tbody>
@@ -1722,86 +1717,8 @@ async function run() {
           
             
             
-          <div class="u-row-container" style="padding: 0px;background-color: transparent">
-            <div class="u-row" style="margin: 0 auto;min-width: 320px;max-width: 600px;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;background-color: #ffffff;">
-              <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
-                <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: #ffffff;"><![endif]-->
-                
-          <!--[if (mso)|(IE)]><td align="center" width="198" style="background-color: #eae6e6;width: 198px;padding: 0px;border-top: 0px solid transparent;border-left: 1px solid #2d2d2d;border-right: 1px solid #323232;border-bottom: 1px solid #323232;" valign="top"><![endif]-->
-          <div class="u-col u-col-33p33" style="max-width: 320px;min-width: 200px;display: table-cell;vertical-align: top;">
-            <div style="background-color: #eae6e6;height: 100%;width: 100% !important;">
-            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 1px solid #2d2d2d;border-right: 1px solid #323232;border-bottom: 1px solid #323232;"><!--<![endif]-->
+          
             
-          <table id="u_content_text_92" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-            <tbody>
-              <tr>
-                <td style="overflow-wrap:break-word;word-break:break-word;padding:10px 10px 10px 15px;font-family:'Montserrat',sans-serif;" align="left">
-                  
-            <div class="v-text-align" style="font-size: 14px; color: #000000; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="line-height: 140%;">Product Name</p>
-            </div>
-          
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
-            </div>
-          </div>
-          <!--[if (mso)|(IE)]></td><![endif]-->
-          <!--[if (mso)|(IE)]><td align="center" width="199" style="background-color: #e6e5e5;width: 199px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3c3b3b;border-bottom: 1px solid #323232;" valign="top"><![endif]-->
-          <div class="u-col u-col-33p33" style="max-width: 320px;min-width: 200px;display: table-cell;vertical-align: top;">
-            <div style="background-color: #e6e5e5;height: 100%;width: 100% !important;">
-            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3c3b3b;border-bottom: 1px solid #323232;"><!--<![endif]-->
-            
-          <table id="u_content_text_93" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-            <tbody>
-              <tr>
-                <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
-                  
-            <div class="v-text-align" style="font-size: 14px; color: #000000; line-height: 140%; text-align: left; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;">1</span></p>
-            </div>
-          
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
-            </div>
-          </div>
-          <!--[if (mso)|(IE)]></td><![endif]-->
-          <!--[if (mso)|(IE)]><td align="center" width="199" style="background-color: #e3e2e2;width: 199px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #323232;" valign="top"><![endif]-->
-          <div class="u-col u-col-33p33" style="max-width: 320px;min-width: 200px;display: table-cell;vertical-align: top;">
-            <div style="background-color: #e3e2e2;height: 100%;width: 100% !important;">
-            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #323232;"><!--<![endif]-->
-            
-          <table id="u_content_text_94" style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-            <tbody>
-              <tr>
-                <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
-                  
-            <div class="v-text-align" style="font-size: 14px; color: #000000; line-height: 140%; text-align: right; word-wrap: break-word;">
-              <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 16px; line-height: 22.4px;">$500</span></p>
-            </div>
-          
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          
-            <!--[if (!mso)&(!IE)]><!--></div><!--<![endif]-->
-            </div>
-          </div>
-          <!--[if (mso)|(IE)]></td><![endif]-->
-                <!--[if (mso)|(IE)]></tr></table></td></tr></table><![endif]-->
-              </div>
-            </div>
-            </div>
-            
-          
           
             
             
@@ -1870,10 +1787,10 @@ async function run() {
               <div style="border-collapse: collapse;display: table;width: 100%;height: 100%;background-color: transparent;">
                 <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding: 0px;background-color: transparent;" align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px;"><tr style="background-color: transparent;"><![endif]-->
                 
-          <!--[if (mso)|(IE)]><td align="center" width="398" style="width: 398px;padding: 0px;border-top: 0px solid transparent;border-left: 1px solid #3b3a3a;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #323232;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+          <!--[if (mso)|(IE)]><td align="center" width="398" style="width: 398px;padding: 0px;border-top: 1px solid transparent;border-left: 1px solid #3b3a3a;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #323232;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
           <div class="u-col u-col-66p67" style="max-width: 320px;min-width: 400px;display: table-cell;vertical-align: top;">
             <div style="height: 100%;width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
-            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 1px solid #3b3a3a;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #323232;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 1px solid transparent;border-left: 1px solid #3b3a3a;border-right: 1px solid #3b3a3a;border-bottom: 1px solid #323232;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
             
           <table style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
             <tbody>
@@ -1893,10 +1810,10 @@ async function run() {
             </div>
           </div>
           <!--[if (mso)|(IE)]></td><![endif]-->
-          <!--[if (mso)|(IE)]><td align="center" width="199" style="width: 199px;padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #2a2a2a;border-bottom: 1px solid #3b3a3a;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
+          <!--[if (mso)|(IE)]><td align="center" width="199" style="width: 199px;padding: 0px;border-top: 1px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #2a2a2a;border-bottom: 1px solid #3b3a3a;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;" valign="top"><![endif]-->
           <div class="u-col u-col-33p33" style="max-width: 320px;min-width: 200px;display: table-cell;vertical-align: top;">
             <div style="height: 100%;width: 100% !important;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;">
-            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 0px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #2a2a2a;border-bottom: 1px solid #3b3a3a;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
+            <!--[if (!mso)&(!IE)]><!--><div style="box-sizing: border-box; height: 100%; padding: 0px;border-top: 1px solid transparent;border-left: 0px solid transparent;border-right: 1px solid #2a2a2a;border-bottom: 1px solid #3b3a3a;border-radius: 0px;-webkit-border-radius: 0px; -moz-border-radius: 0px;"><!--<![endif]-->
             
           <table style="font-family:'Montserrat',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
             <tbody>
@@ -2168,10 +2085,10 @@ async function run() {
                 <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 15px; line-height: 170%; text-align: left; word-wrap: break-word;">
-              <p style="line-height: 170%;">Farid Alam</p>
-          <p style="line-height: 170%;">Kewa sherpur</p>
-          <p style="line-height: 170%;">8764564556465</p>
-          <p style="line-height: 170%;">test@gmail.com</p>
+              <p style="line-height: 170%;">${order?.userDetails?.userName}</p>
+          <p style="line-height: 170%;">${order?.userDetails?.address}, ${order?.userDetails?.country}, ${order?.userDetails?.states}, ${order?.userDetails?.zipCode}</p>
+          <p style="line-height: 170%;">${order?.userDetails?.userPhoneNumber}</p>
+          <p style="line-height: 170%;">${order?.userDetails?.email}</p>
             </div>
           
                 </td>
@@ -2194,10 +2111,10 @@ async function run() {
                 <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Montserrat',sans-serif;" align="left">
                   
             <div class="v-text-align" style="font-size: 15px; line-height: 170%; text-align: left; word-wrap: break-word;">
-              <p style="line-height: 170%;">Farid Alam</p>
-          <p style="line-height: 170%;">Kewa Sherpur</p>
-          <p style="line-height: 170%;">1234123413</p>
-          <p style="line-height: 170%;">test@gmail.com</p>
+            <p style="line-height: 170%;">${order?.shipping_address?.userName || order?.userDetails?.userName}</p>
+            <p style="line-height: 170%;">${order?.shipping_address?.address || order?.userDetails?.address}, ${order?.shipping_address?.country || order?.userDetails?.country}, ${order?.shipping_address?.states || order?.userDetails?.states}, ${order?.shipping_address?.zipCode || order?.userDetails?.zipCode}</p>
+            <p style="line-height: 170%;">${order?.shipping_address?.userPhoneNumber || order?.userDetails?.userPhoneNumber}</p>
+            <p style="line-height: 170%;">${order?.shipping_address?.email || order?.userDetails?.email}</p>
             </div>
           
                 </td>

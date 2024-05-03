@@ -1,0 +1,8 @@
+// DB_USER=MBB-E-Commerce
+// DB_PASS=cpkSWngaf375U8Yk
+// CLOUD_NAME=dyewzhari
+// API_KEY=264716128287773
+// UPLOAD_PRESET=iwbft8xu
+// API_SECRET=3AZ-ugOWJMRhX3l-8ZSJd7VoU94
+// PAYMENT_SECRETKEY=sk_test_51Os6QHAQkbe9BvrZeNfp4n4Y2J0hpbWfUl4VmLtYXtVTAkPk8wLsGDdStCl0byDdl5UzGpKzvADbzoHofu5uPF7C00kWw9aWjb
+// GOOGLE_APP_PASS="zujb aejk tebo wans"
