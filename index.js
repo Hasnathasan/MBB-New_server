@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
     user: 'yourgmail@gmail.com', // Your Gmail email address
     clientId: '862564797662-83jmang95acvqdnlhpmh66tga87pm44j.apps.googleusercontent.com',
     clientSecret: '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',
-    refreshToken: 'your-refresh-token'
+    refreshToken: '1//05r2Evq-J7MeICgYIARAAGAUSNwF-L9IrPQE1-iWAIHgMINjAH96PPXD63IzvbqVs0-9r5_Kii6A3Os6pRjHPGRyBjp2XCUORltg'
   }
 });
 
@@ -106,6 +106,22 @@ async function run() {
     const taxAndShippingMethodCollection = db.collection('tax-shipping');
 
 
+    app.get('/oauth2callback', async (req, res) => {
+      const { code } = req.query;
+    
+      if (!code) {
+        return res.status(400).send('Authorization code not found.');
+      }
+    
+      try {
+        const { tokens } = await oauth2Client.getToken(code);
+        console.log('Refresh token:', tokens.refresh_token);
+        res.send(tokens); 
+      } catch (error) {
+        console.error('Error exchanging authorization code for refresh token:', error);
+        res.status(500).send('Error obtaining refresh token.');
+      }
+    });
 
 
     app.post('/uploadSingle', async (req, res) => {
