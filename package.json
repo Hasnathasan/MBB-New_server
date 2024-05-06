@@ -23,6 +23,7 @@
     "nodemailer": "^6.9.13",
     "nodemailer-mailgun-transport": "^2.1.5",
     "path": "^0.12.7",
+    "puppeteer": "^22.7.1",
     "stripe": "^14.20.0"
   }
 }
