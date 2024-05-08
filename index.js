@@ -104,7 +104,7 @@ app.get('/', (req, res) => {
   let mailOptions = {
       from: 'hasnatoooooooo@gmail.com',
       to: recipientEmail,
-      subject: 'PDF Attachment Test',
+      subject: 'Your order has been received',
       html: htmlContent,
       attachments: [{ 
           path: pdfPath
@@ -221,6 +221,35 @@ async function run() {
       const id = req.params.id;
       const result = await wishListCollection.findOne({"product._id": id})
       res.send(result)
+    })
+
+    app.post("/contactWithUser", async(req, res) => {
+      const {email, name, message} = req.body;
+      let mailOptions = {
+        from: 'hasnatoooooooo@gmail.com',
+        to: 'hasnatoooooooo@gmail.com',
+        subject: 'Contact mail from user',
+        html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Message from user</title>
+        </head>
+        <body>
+           <h3>Hello there,</h3>
+           <h4>${message}</h4>
+           <br />
+            <h4>Mailed by ${name}</h4>
+            <h4>Email: ${email}</h4>
+        </body>
+        </html>
+        `,
+    };
+    let info = await transporter.sendMail(mailOptions);
+    console.log(info);
+    res.status(200).json({message: "email send successfull"})
     })
 
 
