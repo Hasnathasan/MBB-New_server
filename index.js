@@ -226,23 +226,23 @@ async function run() {
     app.post("/contactWithUser", async(req, res) => {
       const {email, name, message} = req.body;
       let mailOptions = {
-        from: 'hasnatoooooooo@gmail.com',
+        from: email,
         to: 'hasnatoooooooo@gmail.com',
-        subject: 'Contact mail from user',
+        subject: `New Message from ${name}`,
         html: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Message from user</title>
+            <title>New Message</title>
         </head>
         <body>
-           <h3>Hello there,</h3>
+           <h3>Hello,</h3>
+           <h4>You got a new message from ${name}:</h3>
            <h4>${message}</h4>
            <br />
-            <h4>Mailed by ${name}</h4>
-            <h4>Email: ${email}</h4>
+            <h3>Mailed by: ${email}</h3>
         </body>
         </html>
         `,
