@@ -2,7 +2,9 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require("cors");
+const chromium = require('chrome-aws-lambda');
 const puppeteer = require('puppeteer');
+const { PDFDocument, rgb } = require('pdf-lib');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 // var jwt = require('jsonwebtoken');
@@ -26,6 +28,7 @@ var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  host: 'smtp.gmail.com', port: 465, secure: true,
   auth: {
     user: 'webdev206804@gmail.com', // Your Gmail email address
     pass: "zujb aejk tebo wans"
@@ -87,18 +90,20 @@ app.get('/', (req, res) => {
 })
 
 
- const convertHtmlToPdf = async(htmlContent, outputPath) => {
+const generatePdfFromHtml = async (htmlContent) => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  
+
   await page.setContent(htmlContent);
-  await page.pdf({ path: outputPath, format: 'A4' });
+  const pdfBuffer = await page.pdf({ format: 'A4' });
 
   await browser.close();
-}
+
+  return pdfBuffer;
+};
 
 // Function to send email with attachment
- const sendEmailWithAttachment = async(pdfPath, recipientEmail, htmlContent) => {
+ const sendEmailWithAttachment = async(pdfBuffer, recipientEmail, htmlContent) => {
   
 
   let mailOptions = {
@@ -106,9 +111,10 @@ app.get('/', (req, res) => {
       to: recipientEmail,
       subject: 'Your order has been received',
       html: htmlContent,
-      attachments: [{ 
-          path: pdfPath
-      }]
+      attachments: [{
+        filename: 'output.pdf',
+        content: pdfBuffer
+    }]
   };
 
   try{
@@ -239,10 +245,14 @@ async function run() {
         </head>
         <body>
            <h3>Hello,</h3>
-           <h4>You got a new message from ${name}:</h3>
-           <h4>${message}</h4>
+           <h4 style="margin-bottom: 100px">You got a new message from ${name}-</h3>
            <br />
+           <div style="background-color: #ddd; padding: 20px; border-radius: 5px; font-size: 18px; color: #000">
+              <pre>${message}</pre>
+              <br />
             <h3>Mailed by: ${email}</h3>
+           </div>
+           
         </body>
         </html>
         `,
@@ -1393,7 +1403,7 @@ async function run() {
       res.send(result)
     })
 
-    app.post("/ordersUpdate/:id", async (req, res) => {
+    app.patch("/ordersUpdate/:id", async (req, res) => {
       const orderProductsId = req.body;
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
@@ -2033,7 +2043,7 @@ async function run() {
               <td style="overflow-wrap:break-word;word-break:break-word;padding:15px;font-family:'Montserrat',sans-serif;" align="left">
                 
           <div class="v-text-align" style="font-size: 14px; line-height: 140%; text-align: right; word-wrap: break-word;">
-            <p style="line-height: 140%;">$${order?.shippingMethod?.standard_shipping ? `$${order?.shippingMethod?.standard_shipping}` : ""}
+            <p style="line-height: 140%;">${order?.shippingMethod?.standard_shipping ? `$${order?.shippingMethod?.standard_shipping}` : ""}
             ${order?.shippingMethod?.express_shipping ? `$${order?.shippingMethod?.express_shipping}` : ""}
             ${order?.shippingMethod?.free_shipping == 0 ? `${order?.shippingMethod?.free_shipping}` : ""}</p>
           </div>
@@ -2959,7 +2969,7 @@ async function run() {
               <td style="overflow-wrap:break-word;word-break:break-word;padding:15px;font-family:'Montserrat',sans-serif;" align="left">
                 
           <div class="v-text-align" style="font-size: 14px; line-height: 140%; text-align: right; word-wrap: break-word;">
-            <p style="line-height: 140%;">$${order?.shippingMethod?.standard_shipping ? `$${order?.shippingMethod?.standard_shipping}` : ""}
+            <p style="line-height: 140%;">${order?.shippingMethod?.standard_shipping ? `$${order?.shippingMethod?.standard_shipping}` : ""}
             ${order?.shippingMethod?.express_shipping ? `$${order?.shippingMethod?.express_shipping}` : ""}
             ${order?.shippingMethod?.free_shipping == 0 ? `${order?.shippingMethod?.free_shipping}` : ""}</p>
           </div>
@@ -3267,21 +3277,22 @@ async function run() {
             return await productsCollection.updateOne(query, updateDocForProduct);
           });
           await Promise.all(updatePromises);
-          await convertHtmlToPdf(htmlContentForPDF, pdfPath);
-          await sendEmailWithAttachment(pdfPath, recipientEmail, htmlContent);
+          const pdfBuffer = await generatePdfFromHtml(htmlContent);
+        await sendEmailWithAttachment(pdfBuffer, recipientEmail, htmlContent);
       } catch (error) {
           console.error('Error sending email:', error);
-          res.status(500).json({ error: 'An error occurred while sending email' });
-      } finally {
-          // Clean up resources (e.g., delete the generated PDF)
-          // Make sure to handle any errors in cleanup process
-          try {
-              // Delete the generated PDF file
-              fs.unlinkSync(pdfPath);
-          } catch (error) {
-              console.error('Error deleting PDF file:', error);
-          }
-      }
+          return res.status(500).json({ error: 'An error occurred while sending email' });
+      } 
+      // finally {
+      //     // Clean up resources (e.g., delete the generated PDF)
+      //     // Make sure to handle any errors in cleanup process
+      //     try {
+      //         // Delete the generated PDF file
+      //         fs.unlinkSync(pdfPath);
+      //     } catch (error) {
+      //         console.error('Error deleting PDF file:', error);
+      //     }
+      // }
 
       // Wait for all product updates to complete
       
