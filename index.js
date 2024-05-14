@@ -2,17 +2,19 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require("cors");
-const chromium = require('chrome-aws-lambda');
-const puppeteer = require('puppeteer');
 const fs = require('fs');
-const htmlPdf = require('html-pdf');
 const bodyParser = require('body-parser');
 // var jwt = require('jsonwebtoken');
 var admin = require("firebase-admin");
 const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 const { v4: uuidv4 } = require('uuid');
-let browser;
+// let browser;
+
+const chromium = require("@sparticuz/chromium");
+// const puppeteer = require("puppeteer-core");
+
+
 
 
 // const transporter = nodemailer.createTransport({
@@ -27,24 +29,7 @@ let browser;
 // });
 
 
-const launchBrowser = async () => {
 
-  if (process.env.NODE_ENV !== 'development') {
-      const chromium = require('@sparticuz/chromium');
-      console.log(await chromium.executablePath());
-      chromium.setGraphicsMode = false;
-      const puppeteer = require('puppeteer-core');
-      browser = await puppeteer.launch({
-          args: chromium.args,
-          defaultViewport: chromium.defaultViewport,
-          executablePath: await chromium.executablePath(),
-          headless: chromium.headless,
-      });
-  } else {
-      const puppeteer = require('puppeteer');
-      browser = await puppeteer.launch({ headless: 'new' });
-  }
-};
 
 
 const transporter = nodemailer.createTransport({
@@ -110,17 +95,75 @@ app.get('/', (req, res) => {
   res.send("MBB-E-Commerce is running")
 })
 
+// if (process.env.NODE_ENV == "production") { 
+//   // running on the Vercel platform.
+//   console.log("process.env.NODE_ENV");
+//   puppeteer = require('puppeteer-core');
+// } else {
+//   // running locally.
+//   console.log(process.env.NODE_ENV);
+//   puppeteer = require('puppeteer');
+// }
+const launchBrowser = async () => {
 
-const generatePDFFromHTML = async (htmlContent) => {
-  if (!browser) {
-      throw new Error('Browser is not initialized');
+  try{
+    if (process.env.NODE_ENV !== 'development') {
+      console.log(process.env.NODE_ENV);
+      const chromium = require('@sparticuz/chromium');
+      console.log(await chromium.executablePath());
+      chromium.setGraphicsMode = false;
+      const puppeteer = require('puppeteer-core');
+      browser = await puppeteer.launch({
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+      });
+  } else {
+    console.log(process.env.NODE_ENV);
+      const puppeteer = require('puppeteer');
+      browser = await puppeteer.launch({ headless: 'new' });
   }
-
+  }
+  catch(error){
+    // res.status(500).json({error: error});
+    throw new Error(error)
+  }
+};
+const generatePDFFromHTML = async (htmlContent) => {
+  
+  try{
+  let browser = null;
+  let puppeteer = null;
+  if (process.env.NODE_ENV !== 'development') {
+    
+    // chromium.setGraphicsMode = false;
+     puppeteer = require('puppeteer-core');
+      browser = await puppeteer.launch({
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true
+    });
+} else {
+  console.log(process.env.NODE_ENV);
+     puppeteer = require('puppeteer');
+     browser = await puppeteer.launch({ headless: true, ignoreHTTPSErrors: true });
+}
   const page = await browser.newPage();
   await page.setContent(htmlContent);
-  const pdfBuffer = await page.pdf({ format: 'A4' });
+  // const pdfBuffer = await page.pdf({ format: 'A4' });
+  await page.goto("https://www.facebook.com/");
+        
+  // Take a screenshot
+  const screenshotBuffer = await page.screenshot();
   await page.close();
-  return pdfBuffer;
+  return screenshotBuffer;
+ }
+ catch(error){
+  throw new Error(error)
+ }
 };
 
 
@@ -138,7 +181,7 @@ const generatePDFFromHTML = async (htmlContent) => {
 // };
 
 // Function to send email with attachment
- const sendEmailWithAttachment = async(pdfPath, recipientEmail, htmlContent) => {
+ const sendEmailWithAttachment = async(pdfBuffer, recipientEmail, htmlContent) => {
   
 
   let mailOptions = {
@@ -148,7 +191,7 @@ const generatePDFFromHTML = async (htmlContent) => {
       html: htmlContent,
       attachments: [{
         filename: 'output.pdf',
-        path: pdfPath
+        content: pdfBuffer
     }]
   };
 
@@ -1449,10 +1492,10 @@ async function run() {
       const order = await ordersCollection.findOne(filter);
       console.log(order?._id);
       
-      const pdfFileName = `${uuidv4()}.pdf`;
+      // const pdfFileName = `${uuidv4()}.pdf`;
 
       // Save PDF to temporary storage (Vercel Serverless Functions' /tmp directory)
-      const pdfFilePath = `/tmp/${pdfFileName}`;
+      // const pdfFilePath = `/tmp/${pdfFileName}`;
         const recipientEmail = order?.shipping_address?.email || order?.userDetails?.email; // Assuming you're sending recipient's email in request body
         const htmlContent = `
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -3307,9 +3350,9 @@ async function run() {
         
         `;
         try {
-          if (!browser) {
-            await launchBrowser();
-        }
+        //   if (!browser) {
+        //     await launchBrowser();
+        // }
           const updatePromises = orderProductsId.map(async product => {
             const query = { _id: new ObjectId(product?.product_id) };
             const updateDocForProduct = {
@@ -3319,22 +3362,23 @@ async function run() {
           });
           await Promise.all(updatePromises);
           const pdfBuffer = await generatePDFFromHTML(htmlContentForPDF);
-          fs.writeFileSync(pdfFilePath, pdfBuffer);
-        await sendEmailWithAttachment(pdfFilePath, recipientEmail, htmlContent);
+          // fs.writeFileSync(pdfFilePath, pdfBuffer);
+        await sendEmailWithAttachment(pdfBuffer, recipientEmail, htmlContent);
       } catch (error) {
           console.error('Error sending email:', error);
-          return res.status(500).json(error);
+          return res.status(500).json({Error_Message: `${error}`});
       } 
-      finally {
-          // Clean up resources (e.g., delete the generated PDF)
-          // Make sure to handle any errors in cleanup process
-          try {
-              // Delete the generated PDF file
-              fs.unlinkSync(pdfFilePath);
-          } catch (error) {
-              console.error('Error deleting PDF file:', error);
-          }
-      }
+      // finally {
+      //     // Clean up resources (e.g., delete the generated PDF)
+      //     // Make sure to handle any errors in cleanup process
+      //     try {
+      //         // Delete the generated PDF file
+      //         // fs.unlinkSync(pdfFilePath);
+      //     } catch (error) {
+      //         console.error('Error deleting PDF file:', error);
+      //         return res.status(500).json({Error_Message_Deleting_PDF_FILE: `${error}`});
+      //     }
+      // }
 
       // Wait for all product updates to complete
       
@@ -3600,9 +3644,9 @@ async function run() {
 run().catch(console.dir);
 
 
-app.listen(port, async () => {
+app.listen(port, async (req, res) => {
   console.log(`Server is running on port ${port}`);
-  await launchBrowser();
+    // await launchBrowser();
 });
 
 
