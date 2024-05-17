@@ -133,26 +133,19 @@ const launchBrowser = async () => {
 const generatePDFFromHTML = async (htmlContent) => {
   
   try{
-  let browser = null;
-  let puppeteer = null;
   if (process.env.NODE_ENV !== 'development') {
-    
+    const chromium = require("@sparticuz/chromium");
     // chromium.setGraphicsMode = false;
-     puppeteer = require('puppeteer-core');
-      browser = await puppeteer.launch({
+     let puppeteer = require('puppeteer-core');
+      let browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
+        // headless: chromium.headless,
         ignoreHTTPSErrors: true
     });
-} else {
-  console.log(process.env.NODE_ENV);
-     puppeteer = require('puppeteer');
-     browser = await puppeteer.launch({ headless: true, ignoreHTTPSErrors: true });
-}
-  const page = await browser.newPage();
-  await page.setContent(htmlContent);
+    const page = await browser.newPage();
+  // await page.setContent(htmlContent);
   // const pdfBuffer = await page.pdf({ format: 'A4' });
   await page.goto("https://www.facebook.com/");
         
@@ -160,6 +153,21 @@ const generatePDFFromHTML = async (htmlContent) => {
   const screenshotBuffer = await page.screenshot();
   await page.close();
   return screenshotBuffer;
+} else {
+  console.log(process.env.NODE_ENV);
+     let puppeteer = require('puppeteer');
+     let browser = await puppeteer.launch({ headless: true, ignoreHTTPSErrors: true });
+     const page = await browser.newPage();
+  // await page.setContent(htmlContent);
+  // const pdfBuffer = await page.pdf({ format: 'A4' });
+  await page.goto("https://www.facebook.com/");
+        
+  // Take a screenshot
+  const screenshotBuffer = await page.screenshot();
+  await page.close();
+  return screenshotBuffer;
+}
+  
  }
  catch(error){
   throw new Error(error)
@@ -190,7 +198,7 @@ const generatePDFFromHTML = async (htmlContent) => {
       subject: 'Your order has been received',
       html: htmlContent,
       attachments: [{
-        filename: 'output.pdf',
+        filename: 'screenshot.png',
         content: pdfBuffer
     }]
   };
@@ -230,6 +238,7 @@ async function run() {
     const bannerImageCollection = db.collection('bannar-images');
     const SystemSettingCollection = db.collection('system-settings');
     const taxAndShippingMethodCollection = db.collection('tax-shipping');
+    const imageCollection = db.collection('image-collection');
 
 
 
@@ -304,6 +313,17 @@ async function run() {
     app.get("/isWishListed/:id", async(req, res) => {
       const id = req.params.id;
       const result = await wishListCollection.findOne({"product._id": id})
+      res.send(result)
+    })
+
+    app.get("/imageGet", async(req, res) => {
+      const result = await imageCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.post("/imageUploader", async(req, res) => {
+      const {imageUrl} = req.body;
+      const result = await imageCollection.insertOne({imageUrl});
       res.send(result)
     })
 
@@ -700,7 +720,7 @@ async function run() {
         console.log(priceSliderArray);
         if (priceSliderArray && priceSliderArray.length === 2) {
           const minPrice = priceSliderArray[0];
-          const maxPrice = priceSliderArray[1];
+          const maxPrice = priceSliderArray[1]; 
 
           priceQuery = { "price.sale_price": { $gte: minPrice, $lte: maxPrice } };
         }
