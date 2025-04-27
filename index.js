@@ -6,13 +6,14 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 // var jwt = require('jsonwebtoken');
 var admin = require("firebase-admin");
-const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
+// const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
+const stripe = require("stripe")("sk_test_51Os6QHAQkbe9BvrZeNfp4n4Y2J0hpbWfUl4VmLtYXtVTAkPk8wLsGDdStCl0byDdl5UzGpKzvADbzoHofu5uPF7C00kWw9aWjb")
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
 const { v4: uuidv4 } = require('uuid');
 // let browser;
 
 const chromium = require("@sparticuz/chromium");
-// const puppeteer = require("puppeteer-core");
+const puppeteer = require("puppeteer-core");
 
 
 
@@ -107,7 +108,7 @@ app.get('/', (req, res) => {
 const launchBrowser = async () => {
 
   try{
-    if (process.env.NODE_ENV !== 'development') {
+    if (process.env.NODE_ENV !== 'production') {
       console.log(process.env.NODE_ENV);
       const chromium = require('@sparticuz/chromium');
       console.log(await chromium.executablePath());
@@ -131,62 +132,90 @@ const launchBrowser = async () => {
   }
 };
 const generatePDFFromHTML = async (htmlContent) => {
-  
-  try{
-  if (process.env.NODE_ENV !== 'development') {
-    const chromium = require("@sparticuz/chromium");
-    // chromium.setGraphicsMode = false;
-     let puppeteer = require('puppeteer-core');
-      let browser = await puppeteer.launch({
+  let browser;
+  try {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const puppeteer = isDevelopment ? require('puppeteer') : require('puppeteer-core');
+    
+    if (isDevelopment) {
+      // In development (your laptop), use normal Puppeteer
+      browser = await puppeteer.launch();
+    } else {
+      // In production (AWS Lambda etc.), use chromium
+      const chromium = require("@sparticuz/chromium");
+      browser = await puppeteer.launch({
+        executablePath: await chromium.executablePath(),
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        // headless: chromium.headless,
-        ignoreHTTPSErrors: true
-    });
+        headless: chromium.headless,
+      });
+    }
+
     const page = await browser.newPage();
-  // await page.setContent(htmlContent);
-  // const pdfBuffer = await page.pdf({ format: 'A4' });
-  await page.goto("https://www.facebook.com/");
-        
-  // Take a screenshot
-  const screenshotBuffer = await page.screenshot();
-  await page.close();
-  return screenshotBuffer;
-} else {
-  console.log(process.env.NODE_ENV);
-     let puppeteer = require('puppeteer');
-     let browser = await puppeteer.launch({ headless: true, ignoreHTTPSErrors: true });
-     const page = await browser.newPage();
-  // await page.setContent(htmlContent);
-  // const pdfBuffer = await page.pdf({ format: 'A4' });
-  await page.goto("https://www.facebook.com/");
-        
-  // Take a screenshot
-  const screenshotBuffer = await page.screenshot();
-  await page.close();
-  return screenshotBuffer;
-}
-  
- }
- catch(error){
-  throw new Error(error)
- }
+    await page.setContent(htmlContent);
+
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+
+    await page.close();
+    await browser.close();
+    
+    return pdfBuffer;
+
+  } catch (error) {
+    console.error('Error generating PDF from HTML:', error);
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (closeError) {
+        console.error('Error closing browser:', closeError);
+      }
+    }
+    throw new Error(`Failed to generate PDF: ${error}`);
+  }
 };
 
+// const convertHtmlToPdf = async(htmlContent, outputPath) => {
+//   const browser = await puppeteer.launch();
+//   const page = await browser.newPage();
 
-// const generatePdfFromHtml = (htmlContent) => {
-//   return new Promise((resolve, reject) => {
-//       const pdfOptions = { format: 'Letter' };
-//       htmlPdf.create(htmlContent, pdfOptions).toBuffer((err, buffer) => {
-//           if (err) {
-//               reject(err);
-//           } else {
-//               resolve(buffer);
-//           }
-//       });
-//   });
-// };
+//   await page.setContent(htmlContent);
+//   await page.pdf({ path: outputPath, format: 'A4' });
+
+//   await browser.close();
+// }
+
+
+
+// const generatePDFFromHTML = async (htmlContent) => {
+
+//   try{
+//    let browser;
+//    if (process.env.NODE_ENV !== 'development') {
+//      console.log(process.env.NODE_ENV);
+//      const chromium = require('@sparticuz/chromium');
+//      chromium.setGraphicsMode = false;
+//      const puppeteer = require('puppeteer-core');
+//       browser = await puppeteer.launch({
+//          args: chromium.args,
+//          defaultViewport: chromium.defaultViewport,
+//          executablePath: await chromium.executablePath(),
+//          headless: chromium.headless,
+//      });
+//  } else {
+//    console.log(process.env.NODE_ENV);
+//      const puppeteer = require('puppeteer');
+//       browser = await puppeteer.launch({ headless: 'new' });
+//  }
+//    const page = await browser.newPage();
+//    await page.setContent(htmlContent);
+//    const pdfBuffer = await page.pdf({ format: 'A4' });
+//    await page.close();
+//    return pdfBuffer;
+//   }
+//   catch(error){
+//    throw new Error(error)
+//   }
+//  };
 
 // Function to send email with attachment
  const sendEmailWithAttachment = async(pdfBuffer, recipientEmail, htmlContent) => {
@@ -198,7 +227,7 @@ const generatePDFFromHTML = async (htmlContent) => {
       subject: 'Your order has been received',
       html: htmlContent,
       attachments: [{
-        filename: 'screenshot.png',
+        filename: 'order.pdf',
         content: pdfBuffer
     }]
   };
@@ -318,6 +347,10 @@ async function run() {
 
     app.get("/imageGet", async(req, res) => {
       const result = await imageCollection.find().toArray();
+      res.send(result);
+    })
+    app.get("/demo", async(req, res) => {
+      const result = {data: "Hello there"};
       res.send(result);
     })
 
