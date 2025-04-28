@@ -9,11 +9,10 @@ var admin = require("firebase-admin");
 // const stripe = require("stripe")(process.env.PAYMENT_SECRETKEY)
 const stripe = require("stripe")("sk_test_51Os6QHAQkbe9BvrZeNfp4n4Y2J0hpbWfUl4VmLtYXtVTAkPk8wLsGDdStCl0byDdl5UzGpKzvADbzoHofu5uPF7C00kWw9aWjb")
 var serviceAccount = require("./public/mbb-e-commerce-firebase-adminsdk-jcum3-7d69c2b6db.json");
-const { v4: uuidv4 } = require('uuid');
-// let browser;
 
-const chromium = require("@sparticuz/chromium");
-const puppeteer = require("puppeteer-core");
+
+
+
 
 
 
@@ -57,7 +56,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 // Middleware
-
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload());
@@ -119,6 +117,7 @@ const launchBrowser = async () => {
           defaultViewport: chromium.defaultViewport,
           executablePath: await chromium.executablePath(),
           headless: chromium.headless,
+          ignoreHTTPSErrors: true,
       });
   } else {
     console.log(process.env.NODE_ENV);
@@ -142,12 +141,14 @@ const generatePDFFromHTML = async (htmlContent) => {
       browser = await puppeteer.launch();
     } else {
       // In production (AWS Lambda etc.), use chromium
-      const chromium = require("@sparticuz/chromium");
+      let chromium = require("@sparticuz/chromium");
+      chromium.setGraphicsMode = false;
       browser = await puppeteer.launch({
-        executablePath: await chromium.executablePath(),
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        headless: chromium.headless,
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+          ignoreHTTPSErrors: true,
       });
     }
 
@@ -1534,7 +1535,7 @@ async function run() {
       res.send(result)
     })
 
-    app.patch("/ordersUpdate/:id", async (req, res) => {
+    app.post("/ordersUpdate/:id", async (req, res) => {
       const orderProductsId = req.body;
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
